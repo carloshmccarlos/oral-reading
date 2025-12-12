@@ -60,17 +60,17 @@ This plan turns the product design and tech stack into concrete, step-by-step im
    - Configure a connection string for the development environment using environment variables.
    - Test: Use a database client or command-line tool to connect with the same connection string and verify that the connection succeeds.
 
-8. **Define Prisma schema models**
-   - Add Prisma to the project and create a schema containing models for Category, Place, Scenario, Story, and VocabularyItem with fields aligned to the tech stack description and the structure of `memory-bank/scenariors.ts`.
+8. **Define Drizzle schema models**
+   - Define the database schema in `src/lib/db/schema.ts` using Drizzleâ€™s Postgres schema helpers.
    - Ensure the relations mirror the hierarchy encoded in `scenariors`: top-level keys as categories, nested object keys as places, and string arrays as scenario seeds (each intended to become one Scenario/Story pair).
-   - Test: Run Prismaâ€™s validation command on the schema and ensure it reports no errors or warnings, then manually check that the models and relations can represent at least one full path from a sample `scenariors` entry (for example, Home â†?Bedroom â†?one scenario string).
+   - Test: Generate migrations from the Drizzle schema and confirm the generated SQL includes tables for Category, Place, Scenario, Story, and VocabularyItem and constraints that match the intended relationships.
 
 9. **Run initial database migration**
-   - Generate and apply the first migration to create the tables corresponding to the defined models.
-   - Test: Inspect the database (via GUI or CLI) and confirm all tables and relations exist with the expected columns and constraints.
+   - Generate and apply the first migration using `drizzle-kit` to create the tables corresponding to the defined Drizzle schema.
+   - Test: Inspect the database (via GUI or CLI) and confirm all tables and constraints exist with the expected columns, uniqueness rules, and indexes.
 
-10. **Create a shared Prisma client helper**
-    - Implement a single, reusable Prisma client helper in a library directory (for example, `src/lib`) following best practices for the App Router.
+10. **Create a shared Drizzle database client helper**
+    - Implement a single, reusable Drizzle database client in `src/lib/db/client.ts` using a pooled Postgres connection.
     - Test: From a single server-side script or temporary route, perform a simple read from the database and confirm it returns successfully.
 
 11. **Seed the database with initial categories and places**
@@ -106,7 +106,7 @@ This plan turns the product design and tech stack into concrete, step-by-step im
 
 ---
 
-## Phase 4 â€?Content Browsing Flows (Categories, Places, Scenarios)
+## Phase 4 â€?Content Browsing Flows ( Categories, Places, Scenarios)
 
 16. **Implement the Categories page**
    - Implement the `/categories` page to mirror the "Context Directory" layout from `memory-bank/UI/categories.html`, with a page header (breadcrumb, title, subtitle) followed by directory sections for each category.
@@ -144,96 +144,96 @@ This plan turns the product design and tech stack into concrete, step-by-step im
 
 ---
 
-## Phase 5 â€?Story Model and Basic Story Page
+## Phase 5 — Home Page and Daily Scenario
 
-23. **Extend data model to store story bodies and audio references**
+23. **Implement the Home page hero section**
+   - Port the hero area from `memory-bank/UI/home.html` into a React + Tailwind + shadcn/ui implementation, including the main headline ("Don't study English. Steal the Context."), supporting description, and primary/secondary calls to action.
+   - Ensure the hero includes clear primary actions such as Start Reading, Browse by Category/Scenarios, and a link to an explanation of how the method works, matching the structure and spacing of the prototype.
+   - Test: Load the Home page and compare it to `home.html` on both desktop and mobile. Confirm that core value propositions are visible without scrolling, that the CTAs are in similar positions, and that typography and spacing are close to the design.
+
+24. **Display category and place overviews on Home**
+   - Show a concise overview of key categories and a small selection of places or scenarios to invite exploration, mirroring the "Pick a Context" grid from `home.html` (cards for Home, Stores, Transit, Social, etc.).
+   - Use cards styled similarly to the cat-card elements in `home.html` (icon, name, meta line, subtle hover state) and link them into deeper pages such as `/categories` or filtered place views.
+   - Test: Load the Home page and compare the category card section to `home.html`. Click several cards and confirm they navigate to the correct Categories or Places/Scenarios pages and that the visual behavior (hover, layout) is consistent.
+
+25. **Implement the Today's Scenario logic**
+   - Decide on a simple algorithm to select a "Today's Scenario" (for example, random from active scenarios, or rotating by date).
+   - Ensure the selection is reproducible for a given day so that users see the same scenario if they return that day.
+   - Test: Implement a visual layout for Today's Scenario similar to the "Daily Scenario" section in `home.html` (image or illustration area, tag pill, title, description, meta counts, CTA), then reload the Home page multiple times on the same day and confirm that the chosen scenario stays consistent; simulate a different day and confirm that both the selected scenario and its card content update.
+
+26. **Create the Today's Scenario card component**
+    - Design a dedicated card on Home that shows the title, category, place, and short description of the selected scenario.
+    - Include a clear call-to-action to read the story.
+    - Test: On Home, confirm that the Today's Scenario card displays valid data and that clicking it navigates directly to the corresponding Story page.
+
+---
+
+## Phase 6 — Story Model and Vocabulary
+
+27. **Extend data model to store story bodies and audio references**
     - Store the Story body as **Markdown** text in the database.
     - Store an optional audio URL pointing to **Cloudflare R2** (audio files will be uploaded manually later).
     - Test: Add at least one Story record manually with a sample Markdown body and audio URL, then confirm via database inspection that the fields are saved correctly.
 
-24. **Define vocabulary and highlight linking strategy**
+28. **Define vocabulary and highlight linking strategy**
    - Use **pattern matching**: store vocabulary phrases in the database and match them against the story Markdown at render time to produce highlights.
    - This approach is simpler and avoids offset drift when story text is edited.
    - Test: For one story, define a small set of phrases, render the story, and verify that each phrase is highlighted in the correct location without collisions, producing a visual effect similar to the highlights in `scenario.html`.
 
-25. **Seed vocabulary items for a pilot story**
+29. **Seed vocabulary items for a pilot story**
     - For one selected story, create several VocabularyItem records including phrase, English meaning, optional Chinese translation, and type (such as phrasal verb or idiom).
     - Test: Query vocabulary items for that story and confirm they return with correct phrases, meanings, and types.
 
-26. **Render highlighted phrases in the Story text**
+30. **Render highlighted phrases in the Story text**
     - Update story rendering so phrases that match vocabulary items are visually highlighted according to the design (subtle color, background, or underline).
     - Ensure highlights do not disrupt reading flow or break words awkwardly.
     - Test: Open the pilot story and visually confirm that only the intended phrases are highlighted and that the rest of the text remains unchanged.
 
-27. **Add phrase tooltips with meanings and translations**
+31. **Add phrase tooltips with meanings and translations**
     - Make each highlighted phrase interactive with hover (desktop) or tap (mobile) to show a tooltip or panel containing the English meaning and optional Chinese translation.
     - Use accessible tooltip components for focus and keyboard support.
     - Test: On desktop, hover and keyboard-focus over phrases to open tooltips; on mobile, tap phrases. Confirm that tooltips display correct text and close reliably.
 
-28. **Build the vocabulary list panel on the Story page**
+32. **Build the vocabulary list panel on the Story page**
    - Add a right-side panel (or below-content section on mobile) listing all vocabulary items for the story, including phrase, English meaning, and optional Chinese translation, modeled on the "Key Phrases" panel in `scenario.html`.
    - Ensure the panel is easy to scan, supports a highlighted state when a term is active, and does not distract from the main narrative, using spacing and typography close to the static design.
    - Test: Open the pilot story on desktop and mobile and compare the panel to `scenario.html`. Confirm the location, item styling, and interaction (including highlight states) work as intended and that all items from the database appear with accurate data.
 
-29. **Add translation visibility controls**
+33. **Add translation visibility controls**
     - Implement a global toggle (for example, a switch) to show or hide translations in both tooltips and the vocabulary panel.
     - Ensure default behavior is sensible for the target audience.
     - Test: Switch translations on and off and confirm that translations hide and show correctly in both highlights and the vocabulary list, without requiring a full page reload.
 
-30. **Add basic font size controls**
+34. **Add basic font size controls**
     - Provide a simple control (such as a slider or segmented control) to adjust story body font size between at least three presets (small, medium, large).
     - Ensure changes apply only to reading-related text and do not break layout.
     - Test: Toggle through all font sizes on mobile and desktop. Confirm that text remains readable and within the viewport without layout overlaps or clipping.
 
 ---
 
-## Phase 6 â€?Audio Narration Integration
+## Phase 7 — Audio Narration Integration
 
-31. **Prepare sample audio files for pilot stories**
+35. **Prepare sample audio files for pilot stories**
     - For at least one story, obtain or create a narration audio file in a web-friendly format and place it in the designated static assets location.
     - Test: Attempt to open the audio file directly in the browser and confirm it plays without errors.
 
-32. **Link audio files in the Story data**
+36. **Link audio files in the Story data**
     - Add audio URLs to the corresponding Story records in the database.
     - Test: Query a Story record in a temporary debug view and verify that the audio URL matches the actual audio file path.
 
-33. **Add audio controls to the Story page**
+37. **Add audio controls to the Story page**
     - Include a simple audio player on the Story page that can play, pause, and seek through the narration.
     - Ensure the player is positioned near the story title or at the top of the content area.
     - Test: Open the Story page, play the audio, pause, and seek. Confirm that audio syncs correctly and there are no overlapping playbacks when navigating between stories.
 
-34. **Refine audio UX for reading and shadowing**
-    - Ensure that the audio playerâ€™s controls are accessible and that volume and progress indicators are easy to use.
+38. **Refine audio UX for reading and shadowing**
+    - Ensure that the audio player's controls are accessible and that volume and progress indicators are easy to use.
     - Consider remembering the last playback position for basic shadowing practice, if within scope.
     - Test: Perform a full listening session on desktop and mobile, checking for glitches, control clarity, and no significant layout shifts while audio is playing.
 
 ---
 
-## Phase 7 â€?Highlighted Phrases and Vocabulary Panel
-
-35. **Implement the Home page hero section**
-   - Port the hero area from `memory-bank/UI/home.html` into a React + Tailwind + shadcn/ui implementation, including the main headline (â€œDonâ€™t study English. Steal the Context.â€?, supporting description, and primary/secondary calls to action.
-   - Ensure the hero includes clear primary actions such as Start Reading, Browse by Category/Scenarios, and a link to an explanation of how the method works, matching the structure and spacing of the prototype.
-   - Test: Load the Home page and compare it to `home.html` on both desktop and mobile. Confirm that core value propositions are visible without scrolling, that the CTAs are in similar positions, and that typography and spacing are close to the design.
-
-36. **Display category and place overviews on Home**
-   - Show a concise overview of key categories and a small selection of places or scenarios to invite exploration, mirroring the "Pick a Context" grid from `home.html` (cards for Home, Stores, Transit, Social, etc.).
-   - Use cards styled similarly to the cat-card elements in `home.html` (icon, name, meta line, subtle hover state) and link them into deeper pages such as `/categories` or filtered place views.
-   - Test: Load the Home page and compare the category card section to `home.html`. Click several cards and confirm they navigate to the correct Categories or Places/Scenarios pages and that the visual behavior (hover, layout) is consistent.
-
-37. **Implement the Todayâ€™s Scenario logic**
-   - Decide on a simple algorithm to select a â€œTodayâ€™s Scenarioâ€?(for example, random from active scenarios, or rotating by date).
-   - Ensure the selection is reproducible for a given day so that users see the same scenario if they return that day.
-   - Test: Implement a visual layout for Todayâ€™s Scenario similar to the "Daily Scenario" section in `home.html` (image or illustration area, tag pill, title, description, meta counts, CTA), then reload the Home page multiple times on the same day and confirm that the chosen scenario stays consistent; simulate a different day and confirm that both the selected scenario and its card content update.
-
-38. **Create the Todayâ€™s Scenario card component**
-    - Design a dedicated card on Home that shows the title, category, place, and short description of the selected scenario.
-    - Include a clear call-to-action to read the story.
-    - Test: On Home, confirm that the Todayâ€™s Scenario card displays valid data and that clicking it navigates directly to the corresponding Story page.
-
----
-
-## Phase 8 â€?Home Page and Daily Scenario
+## Phase 8 — About Page
 
 39. **Implement the About / Help page content**
    - Add a page explaining how to use the site, highlighting the narrative approach, phrase highlighting, translations, vocabulary panel, and audio, using `memory-bank/UI/about.html` as the layout and visual reference (hero mission statement, dark "problem" section, method/legend section, features grid, and signature block).
@@ -247,7 +247,7 @@ This plan turns the product design and tech stack into concrete, step-by-step im
 
 ---
 
-## Phase 10 â€?URL State, Filters, and Interactivity
+## Phase 9 — URL State, Filters, and Interactivity
 
 41. **Implement URL-based filtering for Places**
     - Use URL query parameters to filter places by category in a way that supports bookmarking and sharing.
@@ -264,7 +264,7 @@ This plan turns the product design and tech stack into concrete, step-by-step im
 
 ---
 
-## Phase 11 â€?Analytics, Performance, and Accessibility
+## Phase 10 — Analytics, Performance, and Accessibility
 
 44. **Integrate basic analytics**
     - Add pageview tracking using the chosen analytics tools and ensure that Story page views are captured.
@@ -284,7 +284,7 @@ This plan turns the product design and tech stack into concrete, step-by-step im
 
 ---
 
-## Phase 12 â€?Testing, QA, and Content Expansion
+## Phase 11 — Testing, QA, and Content Expansion
 
 48. **Write unit tests for core components**
     - Add tests for layout, navigation, cards, story reader, and interactive controls (font size, translation toggle).

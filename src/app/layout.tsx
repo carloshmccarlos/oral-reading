@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
 import './globals.css'
+import { SiteFooter } from '@/components/site-footer'
+import { SiteHeader } from '@/components/site-header'
 
 const inter = Inter({
   variable: '--font-sans',
@@ -28,7 +30,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} antialiased`}>{children}</body>
+      <body className={`${inter.variable} ${playfair.variable} antialiased`}>
+        {/* Global shell (Phase 3): consistent header/footer across routes */}
+        <div className="min-h-screen">
+          <SiteHeader />
+          <main className="mx-auto max-w-container px-8">{children}</main>
+          <SiteFooter />
+        </div>
+      </body>
     </html>
   )
 }

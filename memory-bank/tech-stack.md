@@ -9,7 +9,7 @@
 - **Animations:** Framer Motion for subtle page and element transitions
 - **State & URL Params:** React state + `nuqs` for URL search parameter state
 - **Validation:** Zod for runtime schema validation (forms, URL/query params, server data)
-- **Data Layer:** PostgreSQL + Prisma ORM
+- **Data Layer:** PostgreSQL + Drizzle ORM (drizzle-orm + drizzle-kit)
 - **Deployment:** Vercel (app) + managed Postgres (e.g., Neon/Supabase/Railway)
 - **Storage:** PostgreSQL for structured content; static assets (audio, images) in `/public` or object storage (e.g., S3-compatible) later
 - **Analytics:** Vercel Analytics + optional PostHog for event tracking
@@ -24,8 +24,9 @@ This stack is optimized for: fast reading experience, clean UI, simple deploymen
   - `src/app` – Next.js App Router routes (`/`, `/categories`, `/places`, `/scenarios`, `/stories/[storySlug]`, `/about`)
   - `src/components` – shared UI components (cards, layout, navigation, story reader, phrase tooltip, vocab panel)
   - `src/components/_...` – feature-scoped private components when needed
-  - `src/lib` – utilities (Prisma client, feature helpers, analytics, etc.)
-  - `prisma/schema.prisma` – data models for categories, places, scenarios, stories, vocabulary entries
+  - `src/lib` – utilities (Drizzle DB client, schema, queries, feature helpers, analytics, etc.)
+  - `src/lib/db/schema.ts` – data models for categories, places, scenarios, stories, vocabulary entries
+  - `drizzle.config.ts` – Drizzle configuration
 
 - **Rendering strategy**
   - Use **React Server Components** by default for pages and most components.
@@ -88,10 +89,10 @@ This stack is optimized for: fast reading experience, clean UI, simple deploymen
     - Category → Place → Scenario → Story → Vocabulary List.
   - Easy to host on Neon, Supabase, or Railway.
 
-- **ORM: Prisma**
-  - Type-safe database client with schema-driven models.
-  - Convenient migrations and seeding for categories, places, scenarios, and stories.
-  - Auto-generated TypeScript types used across server components.
+- **ORM: Drizzle ORM**
+  - Type-safe SQL with lightweight, explicit schema definitions.
+  - Migrations via `drizzle-kit`.
+  - Use Drizzle schemas as the source of truth for DB structure.
 
 - **Data modeling (conceptual)**
   - `Category`: id, slug, name, description.
@@ -112,7 +113,7 @@ This stack is optimized for: fast reading experience, clean UI, simple deploymen
   - Render audio using native `<audio>` element or shadcn/ui-compatible component.
 
 - **APIs**
-  - Prefer **server components + direct Prisma access** over REST/GraphQL for internal consumption.
+  - Prefer **server components + direct Drizzle queries** over REST/GraphQL for internal consumption.
   - Add dedicated API routes only when needed (e.g., tracking events, future authenticated features).
 
 - **Validation (Zod)**
