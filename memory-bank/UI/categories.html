@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Categories | Read Oral English</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Palette: Modern/Organic/Fashion */
+            --bg-color: #F7F7F5;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --accent-color: #D6E865;
+            --border-color: #E0E0E0;
+            --card-bg: #FFFFFF;
+            
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            
+            --spacing-container: 1200px;
+            --radius-sm: 8px;
+            --radius-pill: 100px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+
+        /* Utility */
+        .container {
+            max-width: var(--spacing-container);
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* --- Header (Consistent) --- */
+        header {
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: rgba(247, 247, 245, 0.95);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 600; font-style: italic; }
+        .nav-links { display: none; gap: 2.5rem; }
+        .nav-links a { font-size: 0.9rem; font-weight: 500; position: relative; }
+        .nav-links a:hover { opacity: 0.6; }
+        @media(min-width: 768px) { .nav-links { display: flex; } }
+
+        /* --- Page Title Area --- */
+        .page-header {
+            padding: 6rem 0 4rem 0;
+            border-bottom: 1px solid var(--text-main);
+        }
+
+        .breadcrumb {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .page-title {
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            line-height: 1.1;
+        }
+
+        .page-subtitle {
+            margin-top: 1rem;
+            max-width: 500px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        /* --- Directory Layout --- */
+        .directory-section {
+            padding: 4rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* The Grid: Left Label, Right Content */
+        .category-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media(min-width: 900px) {
+            .category-row {
+                grid-template-columns: 1fr 2.5fr; /* 1/3 label, 2/3 content */
+                gap: 4rem;
+            }
+        }
+
+        /* Left Side: Category Label */
+        .cat-label-group {
+            position: relative;
+        }
+        
+        .cat-index {
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 0.5rem;
+            font-style: italic;
+        }
+
+        .cat-heading {
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+        }
+
+        .cat-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            max-width: 280px;
+            line-height: 1.5;
+        }
+
+        /* Right Side: Places Grid */
+        .places-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .place-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: var(--radius-sm);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 140px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .place-card:hover {
+            border-color: var(--text-main);
+            transform: translateY(-2px);
+            background-color: #FAFAF8;
+        }
+
+        /* The 'Active' state simulation */
+        .place-card.popular::after {
+            content: '🔥 Popular';
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--accent-color);
+            font-size: 0.65rem;
+            padding: 4px 8px;
+            font-weight: 600;
+            border-bottom-left-radius: 8px;
+        }
+
+        .place-name {
+            font-family: var(--font-serif);
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .place-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .arrow-icon {
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s;
+        }
+
+        .place-card:hover .arrow-icon {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* --- Footer (Minimal) --- */
+        footer {
+            padding: 4rem 0;
+            margin-top: 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container nav-wrapper">
+            <a href="/" class="logo">Read Oral English.</a>
+            <nav class="nav-links">
+                <a href="/">Home</a>
+                <a href="/categories" style="border-bottom: 1px solid black;">Categories</a>
+                <a href="/about">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <!-- Page Intro -->
+        <section class="page-header">
+            <div class="breadcrumb">Home / Categories</div>
+            <h1 class="page-title">The Context Directory</h1>
+            <p class="page-subtitle">Select a setting to view available scenarios. Real English happens in specific places, not in grammar tables.</p>
+        </section>
+
+        <!-- Category 01: HOME -->
+        <section class="directory-section">
+            <div class="category-row">
+                <!-- Left: Label -->
+                <div class="cat-label-group">
+                    <span class="cat-index">01 — Private Life</span>
+                    <h2 class="cat-heading">At Home</h2>
+                    <p class="cat-desc">
+                        The vocabulary of your daily routine. From waking up to managing chores and winding down.
+                    </p>
+                </div>
+                
+                <!-- Right: Places -->
+                <div class="places-grid">
+                    <!-- Place Card -->
+                    <a href="/scenarios?place=bedroom" class="place-card popular">
+                        <h3 class="place-name">Bedroom</h3>
+                        <div class="place-meta">
+                            <span>6 Scenarios</span>
+                            <span class="arrow-icon">&rarr;</span>
+                        </div>
+                    </a>
+
+                    <a href="/scenarios?place=kitchen" class="place-card">
+                        <h3 class="place-name">Kitchen</h3>
+                        <div class="place-meta">
+                            <span>8 Scenarios</span>
+                            <span class="arrow-icon">&rarr;</span>
+                        </div>
+                    </a>
+
+                    <a href="/scenarios?place=living-room" class="place-card">
+                        <h3 class="place-name">Living Room</h3>
+                        <div class="place-meta">
+                            <span>5 Scenarios</span>
+                            <span class="arrow-icon">&rarr;</span>
+                        </div>
+                    </a>
+
+                    <a href="/scenarios?place=bathroom" class="place-card">
+                        <h3 class="place-name">Bathroom</h3>
+                        <div class="place-meta">
+                            <span>3 Scenarios</span>
+                            <span class="arrow-icon">&rarr;</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category 02: STORES -->
+        <section class="directory-section">
+            <div class="category-row">
+                <!-- Left: Label -->
+                <div class="cat-label-group">
+                    <span class="cat-index">02 — Commerce</span>
+                    <h2 class="cat-heading">Stores</h2>
+                    <p class="cat-desc">
+                        Transactions, browsing, and asking for help. The language of buying things.
+                    </p>
+                </div>
+                
+                <!-- Right: Places -->
+                <div class="places-grid">
+                    <a href="/scenarios?place=supermarket" class="place-card popular">
+                        <h3 class="place-name">Supermarket</h3>
+                        <div class="place-meta">
+                            <span>10 Scenarios</span>
+                            <span class="arrow-icon">&rarr;</span>
+                        </div>
+                    </a>
+
+                    <a href="/scenarios?place=convenience-store" class="place-card">
+                        <h3 class="place-name">Convenience Store</h3>
+                        <div class="place-meta">
+                            <span>4 Scenarios</span>
+                            <span class="arrow-icon">&rarr;</span>
+                        </div>
+                    </a>
+
+                    <a href="/scenarios?place=clothing-store" class="place-card">
+                        <h3 class="place-name">Clothing Shop</h3>
+                        <div class="place-meta">
+                            <span>5 Scenarios</span>
+                            <span class="arrow-icon">&rarr;</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Category 03: TRANSPORT -->
+        <section class="directory-section" style="border-bottom: none;">
+            <div class="category-row">
+                <!-- Left: Label -->
+                <div class="cat-label-group">
+                    <span class="cat-index">03 — Transit</span>
+                    <h2 class="cat-heading">Transport</h2>
+                    <p class="cat-desc">
+                        Getting from point A to B. Dealing with delays, tickets, and directions.
+                    </p>
+                </div>
+                
+                <!-- Right: Places -->
+                <div class="places-grid">
+                    <a href="/scenarios?place=subway" class="place-card">
+                        <h3 class="place-name">Subway / Metro</h3>
+                        <div class="place-meta">
+                            <span>6 Scenarios</span>
+                            <span class="arrow-icon">&rarr;</span>
+                        </div>
+                    </a>
+
+                    <a href="/scenarios?place=bus-stop" class="place-card popular">
+                        <h3 class="place-name">Bus Stop</h3>
+                        <div class="place-meta">
+                            <span>3 Scenarios</span>
+                            <span class="arrow-icon">&rarr;</span>
+                        </div>
+                    </a>
+
+                    <a href="/scenarios?place=taxi" class="place-card">
+                        <h3 class="place-name">Taxi / Uber</h3>
+                        <div class="place-meta">
+                            <span>4 Scenarios</span>
+                            <span class="arrow-icon">&rarr;</span>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Box -->
+        <div style="background: var(--text-main); color: var(--bg-color); padding: 4rem; border-radius: var(--radius-sm); margin-top: 2rem; text-align: center;">
+            <h2 style="font-family: var(--font-serif); font-size: 2.5rem; margin-bottom: 1rem;">Don't see a context?</h2>
+            <p style="color: #999; margin-bottom: 2rem;">We add new scenarios weekly based on user requests.</p>
+            <a href="#" style="background: var(--accent-color); color: var(--text-main); padding: 1rem 2rem; border-radius: var(--radius-pill); font-weight: 600;">Request a Topic</a>
+        </div>
+
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Read Oral English. Designed for Learners.</p>
+    </footer>
+
+</body>
+</html>

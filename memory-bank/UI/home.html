@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Read Oral English | Context-Based Learning</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Palette: Modern/Organic/Fashion */
+            --bg-color: #F7F7F5;       /* Warm bone/paper */
+            --text-main: #111111;      /* Soft Black */
+            --text-muted: #666666;
+            --accent-color: #D6E865;   /* Acid Lime/Matcha - Trendy Pop */
+            --border-color: #E0E0E0;
+            --card-bg: #FFFFFF;
+            
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            
+            --spacing-container: 1200px;
+            --radius-sm: 8px;
+            --radius-pill: 100px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        ul { list-style: none; }
+
+        /* Utility Classes */
+        .container {
+            max-width: var(--spacing-container);
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem 2rem;
+            border-radius: var(--radius-pill);
+            font-weight: 500;
+            font-size: 0.95rem;
+            letter-spacing: 0.02em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background-color: var(--text-main);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+            color: var(--text-main);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            border: 1px solid var(--text-main);
+            background: transparent;
+        }
+        .btn-outline:hover {
+            background: var(--text-main);
+            color: #fff;
+        }
+
+        /* typography */
+        h1, h2, h3 {
+            font-family: var(--font-serif);
+            font-weight: 400;
+            line-height: 1.1;
+        }
+
+        /* --- Header --- */
+        header {
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: rgba(247, 247, 245, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 600;
+            font-style: italic;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            display: none; /* Hidden on mobile */
+        }
+        
+        .nav-links a {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-main);
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 1px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--text-main);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        @media(min-width: 768px) {
+            .nav-links { display: flex; }
+        }
+
+        /* --- Hero Section --- */
+        .hero {
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero-text h1 span {
+            display: block;
+            font-style: italic;
+            color: var(--text-muted);
+            font-size: 0.8em;
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            max-width: 450px;
+        }
+
+        /* Abstract Visual Shape */
+        .hero-visual {
+            position: relative;
+            height: 400px;
+            background: #fff;
+            border-radius: 20px;
+            border: 1px solid var(--text-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 2rem;
+            box-shadow: 10px 10px 0px var(--accent-color);
+            transition: transform 0.3s;
+        }
+        
+        .hero-visual:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 12px 12px 0px var(--accent-color);
+        }
+
+        .snippet-tag {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+
+        .snippet-text {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            line-height: 1.4;
+        }
+
+        .highlight {
+            background-color: var(--accent-color);
+            padding: 0 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        /* Simulating tooltip hint */
+        .highlight::before {
+            content: 'Tap for meaning';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: #fff;
+            font-size: 10px;
+            font-family: var(--font-sans);
+            padding: 4px 8px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        
+        .highlight:hover::before {
+            opacity: 1;
+        }
+
+        @media(min-width: 900px) {
+            .hero-content {
+                grid-template-columns: 1.2fr 1fr;
+            }
+            .hero-text h1 {
+                font-size: 4.5rem;
+            }
+        }
+
+        /* --- Marquee / Divider --- */
+        .marquee-container {
+            border-top: 1px solid var(--text-main);
+            border-bottom: 1px solid var(--text-main);
+            padding: 1.5rem 0;
+            overflow: hidden;
+            white-space: nowrap;
+            background: var(--text-main);
+            color: var(--bg-color);
+        }
+
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        
+        .marquee-item {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            margin-right: 4rem;
+            font-style: italic;
+        }
+
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* --- Featured Categories --- */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+            margin-top: 5rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .cat-card {
+            background: #fff;
+            border: 1px solid transparent;
+            padding: 2rem;
+            border-radius: var(--radius-sm);
+            transition: 0.3s;
+            position: relative;
+            height: 250px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .cat-card:hover {
+            background-color: var(--accent-color);
+            border-color: var(--text-main);
+        }
+
+        .cat-number {
+            font-family: var(--font-serif);
+            font-size: 3rem;
+            color: rgba(0,0,0,0.05);
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            transition: color 0.3s;
+        }
+        
+        .cat-card:hover .cat-number {
+            color: rgba(0,0,0,0.1);
+        }
+
+        .cat-icon {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .cat-name {
+            font-size: 1.5rem;
+            font-weight: 500;
+        }
+
+        .cat-meta {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        .cat-card:hover .cat-meta {
+            color: var(--text-main);
+        }
+
+        /* --- Daily Scenario --- */
+        .daily-section {
+            margin: 6rem 0;
+            background: #fff;
+            border-radius: 20px;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        .daily-image {
+            background-color: #EAEAEA;
+            min-height: 300px;
+            position: relative;
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="40" fill="%23D6E865" opacity="0.5"/></svg>');
+            background-size: cover; 
+            /* Note: In production, this would be a high-quality context photo */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .daily-content {
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .tag-pill {
+            display: inline-block;
+            background: var(--bg-color);
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+            width: fit-content;
+        }
+
+        @media(min-width: 768px) {
+            .daily-section {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* --- Footer --- */
+        footer {
+            margin-top: 6rem;
+            border-top: 1px solid var(--border-color);
+            padding: 4rem 0;
+            background: #fff;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+
+        @media(min-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr 2fr;
+            }
+        }
+
+        .footer-logo {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+        
+        .footer-col h4 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.2rem;
+        }
+        
+        .footer-col li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-col a {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .footer-col a:hover {
+            color: var(--text-main);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container nav-wrapper">
+            <a href="/" class="logo">Read Oral English.</a>
+            
+            <nav class="nav-links">
+                <a href="/categories">Categories</a>
+                <a href="/method">Method</a>
+                <a href="/about">About</a>
+            </nav>
+
+            <a href="/stories/random" class="btn btn-primary">Start Reading</a>
+        </div>
+    </header>
+
+    <!-- Hero -->
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-text">
+                <h1>
+                    <span>Don't study English.</span>
+                    Steal the Context.
+                </h1>
+                <p class="hero-desc">
+                    Stop memorizing lists. Read short, realistic stories full of the micro-actions, inner thoughts, and casual phrases native speakers actually use.
+                </p>
+                <div style="display: flex; gap: 1rem;">
+                    <a href="/categories" class="btn btn-primary">Browse Scenarios</a>
+                    <a href="#demo" class="btn btn-outline">How it works</a>
+                </div>
+            </div>
+
+            <!-- Visual representation of the product UI -->
+            <div class="hero-visual">
+                <div class="snippet-tag">Scenario: Bedroom • Finding Keys</div>
+                <p class="snippet-text">
+                    I sighed and began to <span class="highlight">rummage through</span> the messy drawer, hoping to <span class="highlight">spot</span> them under the receipts.
+                </p>
+                <div style="margin-top: 2rem; display: flex; gap: 10px; opacity: 0.6;">
+                    <div style="height: 4px; width: 30px; background: #000; border-radius: 2px;"></div>
+                    <div style="height: 4px; width: 100%; background: #eee; border-radius: 2px;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Marquee Banner -->
+    <div class="marquee-container">
+        <div class="marquee-content">
+            <span class="marquee-item">Real Life Scenarios</span>
+            <span class="marquee-item">Natural Phrasal Verbs</span>
+            <span class="marquee-item">Internal Monologue</span>
+            <span class="marquee-item">Context-Based Learning</span>
+            <span class="marquee-item">Daily Audio</span>
+            <!-- Repeat for loop -->
+            <span class="marquee-item">Real Life Scenarios</span>
+            <span class="marquee-item">Natural Phrasal Verbs</span>
+            <span class="marquee-item">Internal Monologue</span>
+            <span class="marquee-item">Context-Based Learning</span>
+            <span class="marquee-item">Daily Audio</span>
+        </div>
+    </div>
+
+    <!-- Main Categories -->
+    <main class="container">
+        <!-- Daily Scenario Section -->
+        <section class="daily-section">
+            <div class="daily-image">
+                <!-- Placeholder for dynamic imagery -->
+                <span style="font-family: var(--font-serif); font-size: 5rem; color: #fff; mix-blend-mode: overlay;">Today</span>
+            </div>
+            <div class="daily-content">
+                <span class="tag-pill">Daily Scenario</span>
+                <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Running late for the Morning Bus</h2>
+                <p style="color: var(--text-muted); margin-bottom: 2rem;">
+                    Practice the frantic internal thoughts of checking your pockets, 
+                    zipping up your bag, and sprinting down the street.
+                </p>
+                <div style="margin-bottom: 2rem;">
+                    <span style="margin-right: 15px; font-size: 0.9rem;"><strong>7</strong> Key Phrases</span>
+                    <span style="margin-right: 15px; font-size: 0.9rem;"><strong>4</strong> mins read</span>
+                </div>
+                <a href="/stories/running-late" class="btn btn-primary" style="align-self: flex-start;">Read Scenario</a>
+            </div>
+        </section>
+
+        <div class="section-header">
+            <div>
+                <h2 class="section-title">Pick a Context</h2>
+                <p style="color: var(--text-muted); margin-top: 0.5rem;">Where do you want to be fluent today?</p>
+            </div>
+            <a href="/categories" style="text-decoration: underline; text-underline-offset: 4px;">View all</a>
+        </div>
+
+        <div class="category-grid">
+            <!-- Card 1 -->
+            <a href="/places?cat=home" class="cat-card">
+                <span class="cat-number">01</span>
+                <div>
+                    <div class="cat-icon">🏠</div>
+                    <div class="cat-name">At Home</div>
+                    <div class="cat-meta">Kitchen, Bedroom, Bath...</div>
+                </div>
+                <div style="align-self: flex-end;">&rarr;</div>
+            </a>
+
+            <!-- Card 2 -->
+            <a href="/places?cat=stores" class="cat-card">
+                <span class="cat-number">02</span>
+                <div>
+                    <div class="cat-icon">🛍️</div>
+                    <div class="cat-name">Stores</div>
+                    <div class="cat-meta">Grocery, Clothing, Tech...</div>
+                </div>
+                <div style="align-self: flex-end;">&rarr;</div>
+            </a>
+
+            <!-- Card 3 -->
+            <a href="/places?cat=transport" class="cat-card">
+                <span class="cat-number">03</span>
+                <div>
+                    <div class="cat-icon">🚇</div>
+                    <div class="cat-name">Transit</div>
+                    <div class="cat-meta">Subway, Bus, Taxi...</div>
+                </div>
+                <div style="align-self: flex-end;">&rarr;</div>
+            </a>
+
+            <!-- Card 4 -->
+            <a href="/places?cat=social" class="cat-card">
+                <span class="cat-number">04</span>
+                <div>
+                    <div class="cat-icon">☕</div>
+                    <div class="cat-name">Social</div>
+                    <div class="cat-meta">Cafe, Park, Party...</div>
+                </div>
+                <div style="align-self: flex-end;">&rarr;</div>
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-grid">
+            <div>
+                <div class="footer-logo">Read Oral English.</div>
+                <p style="color: var(--text-muted); font-size: 0.9rem; max-width: 300px;">
+                    Modern language learning through immersion in everyday narrative contexts.
+                </p>
+            </div>
+            
+            <div class="footer-links">
+                <div class="footer-col">
+                    <h4>Explore</h4>
+                    <ul>
+                        <li><a href="#">All Categories</a></li>
+                        <li><a href="#">Latest Stories</a></li>
+                        <li><a href="#">Audio Library</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Learn</h4>
+                    <ul>
+                        <li><a href="#">Methodology</a></li>
+                        <li><a href="#">Vocabulary Lists</a></li>
+                        <li><a href="#">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

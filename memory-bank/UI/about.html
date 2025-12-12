@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About The Method | Read Oral English</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Palette */
+            --bg-color: #F7F7F5;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --accent-color: #D6E865;
+            --border-color: #E0E0E0;
+            
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            
+            --spacing-container: 1000px;
+            --radius-sm: 8px;
+            --radius-pill: 100px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        
+        .container {
+            max-width: var(--spacing-container);
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* --- Header --- */
+        header {
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            background: rgba(247,247,245,0.95);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            z-index: 100;
+        }
+        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 600; font-style: italic; }
+        .nav-links { display: none; gap: 2.5rem; }
+        .nav-links a { font-size: 0.9rem; font-weight: 500; }
+        @media(min-width: 768px) { .nav-links { display: flex; } }
+
+        /* --- Hero Section --- */
+        .hero {
+            padding: 8rem 0 6rem 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            line-height: 1.1;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero h1 em {
+            color: var(--text-muted);
+            font-size: 0.7em;
+            display: block;
+            margin-bottom: 0.5rem;
+            font-style: normal;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-family: var(--font-sans);
+            font-weight: 500;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* --- Dark Section: The Problem --- */
+        .problem-section {
+            background-color: var(--text-main);
+            color: #F2F2F2;
+            padding: 6rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 4rem;
+        }
+
+        @media(min-width: 768px) {
+            .problem-grid { grid-template-columns: 1fr 1fr; align-items: center; }
+        }
+
+        .accent-text {
+            color: var(--accent-color);
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            line-height: 1.3;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            border-left: 1px solid var(--accent-color);
+            padding-left: 2rem;
+        }
+
+        /* --- The Method / Legend Section --- */
+        .method-section {
+            padding: 6rem 0;
+        }
+        
+        .section-label {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: #fff;
+            padding: 2rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .feature-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        /* --- Visual Legend UI --- */
+        .legend-box {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 3rem;
+            margin: 4rem 0;
+            position: relative;
+        }
+
+        .legend-title {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-color);
+            padding: 0 1rem;
+            font-family: var(--font-serif);
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        .demo-sentence {
+            font-family: 'Georgia', serif;
+            font-size: 1.5rem;
+            text-align: center;
+            line-height: 2;
+        }
+
+        .demo-highlight {
+            background: var(--accent-color);
+            padding: 2px 4px;
+            border-radius: 4px;
+            position: relative;
+            cursor: help;
+        }
+        
+        .demo-thought {
+            color: #888;
+            font-style: italic;
+            border-bottom: 1px dashed #ccc;
+        }
+
+        .pointer-line {
+            display: block;
+            width: 1px;
+            height: 40px;
+            background: #000;
+            margin: 10px auto 0;
+        }
+        
+        .pointer-label {
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        /* --- Creator / Signature --- */
+        .signature-section {
+            padding: 4rem 0 6rem 0;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .profile-img {
+            width: 80px;
+            height: 80px;
+            background: #ddd; /* Placeholder */
+            border-radius: 50%;
+            margin: 0 auto 1.5rem;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="30" r="20" fill="%23ccc"/><path d="M20,90 Q50,40 80,90" fill="%23ccc"/></svg>');
+            background-size: cover;
+        }
+
+        .signature {
+            font-family: 'Playfair Display', serif; /* Or a handwriting font */
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            transform: rotate(-2deg);
+            display: inline-block;
+        }
+
+        /* --- Footer --- */
+        footer {
+            padding: 4rem 0;
+            text-align: center;
+            background: #fff;
+            border-top: 1px solid var(--border-color);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container nav-wrapper">
+            <a href="/" class="logo">Read Oral English.</a>
+            <nav class="nav-links">
+                <a href="/categories">Categories</a>
+                <a href="/about" style="border-bottom: 1px solid black;">About</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        
+        <!-- Hero -->
+        <section class="container hero">
+            <h1>
+                <em>Our Mission</em>
+                Bridging the gap between "Textbook English" and Real Life.
+            </h1>
+            <p>
+                We believe you shouldn't learn vocabulary in a void. You should steal it from the context where it naturally lives.
+            </p>
+        </section>
+
+        <!-- The Problem (Dark Mode) -->
+        <section class="problem-section">
+            <div class="container problem-grid">
+                <div>
+                    <div class="accent-text">
+                        "I studied English for 10 years, but I panic when I have to order a coffee."
+                    </div>
+                    <p style="color: #bbb; margin-bottom: 2rem;">
+                        Does this sound familiar? Traditional education focuses on grammar rules and rigid dialogs that nobody actually uses. 
+                    </p>
+                    <p style="color: #bbb;">
+                        When real life happens—when you lose your keys, miss a bus, or need to ask for a refund—the textbook dialogs don't help. You need the messy, casual, phrasal-verb-heavy English that native speakers use intuitively.
+                    </p>
+                </div>
+                
+                <div class="stat-box">
+                    <h3 style="font-family: var(--font-serif); font-size: 1.5rem; margin-bottom: 1rem;">The Context Gap</h3>
+                    <p style="margin-bottom: 2rem;">
+                        <strong>Textbook:</strong> "I am searching for my keys."<br>
+                        <span style="color: var(--accent-color);">Real Life:</span> "I'm <em>rummaging through</em> my bag trying to <em>dig them out</em>."
+                    </p>
+                    <p>
+                        <strong>Textbook:</strong> "Please wait a moment."<br>
+                        <span style="color: var(--accent-color);">Real Life:</span> "Hang on a sec, let me just <em>grab</em> that."
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="container method-section">
+            <div class="section-label">How to use this site</div>
+            
+            <h2 style="font-family: var(--font-serif); font-size: 2.5rem; text-align: center; margin-bottom: 1rem;">Anatomy of a Story</h2>
+            <p style="text-align: center; max-width: 600px; margin: 0 auto; color: var(--text-muted);">
+                We write short, realistic narratives. Here is how we design them to help you learn.
+            </p>
+
+            <!-- Visual Legend -->
+            <div class="legend-box">
+                <span class="legend-title">The Legend</span>
+                
+                <div class="demo-sentence">
+                    <span class="demo-thought">"Where is it?"</span> I muttered, as I <span class="demo-highlight">patted down</span> my pockets.
+                </div>
+
+                <!-- Pointers -->
+                <div style="display: flex; justify-content: space-around; margin-top: 1rem; position: relative;">
+                    
+                    <div style="text-align: center; width: 33%;">
+                        <div class="pointer-line" style="background: #ccc; height: 30px;"></div>
+                        <span class="pointer-label" style="color: #888;">Internal Thought</span>
+                        <p style="font-size: 0.75rem; color: #999; margin-top: 5px;">What people think but don't say.</p>
+                    </div>
+
+                    <div style="text-align: center; width: 33%;">
+                        <div class="pointer-line" style="background: var(--accent-color);"></div>
+                        <span class="pointer-label" style="color: #000; font-weight: 600;">The Highlight</span>
+                        <p style="font-size: 0.75rem; color: #666; margin-top: 5px;">Phrasal verbs & micro-actions.<br>Click for definition.</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Features Grid -->
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🧠</span>
+                    <h3 class="feature-title">Micro-Actions</h3>
+                    <p class="feature-desc">We focus on the small physical movements (zipping, tapping, tossing) that ground language in reality.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">💭</span>
+                    <h3 class="feature-title">Inner Monologue</h3>
+                    <p class="feature-desc">Half of a conversation happens inside your head. We include thoughts so you learn how to express feelings.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🔊</span>
+                    <h3 class="feature-title">Audio Shadowing</h3>
+                    <p class="feature-desc">Every story comes with narration. Listen, pause, and repeat to master the rhythm of the sentence.</p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- Signature -->
+        <section class="container signature-section">
+            <div class="profile-img"></div> <!-- Placeholder for avatar -->
+            <p style="margin-bottom: 0.5rem; font-style: italic; color: var(--text-muted);">Happy Reading,</p>
+            <div class="signature">The Editor</div>
+            <div style="margin-top: 2rem;">
+                <a href="/categories" style="background: var(--text-main); color: #fff; padding: 1rem 2rem; border-radius: var(--radius-pill); font-weight: 500;">Start Reading Now</a>
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">
+                © 2024 Read Oral English. <br>
+                <a href="#" style="text-decoration: underline;">Privacy Policy</a> • <a href="#" style="text-decoration: underline;">Contact</a>
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

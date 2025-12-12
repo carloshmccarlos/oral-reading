@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bedroom Scenarios | Read Oral English</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Palette: Modern/Organic/Fashion */
+            --bg-color: #F7F7F5;
+            --text-main: #111111;
+            --text-muted: #666666;
+            --accent-color: #D6E865;
+            --border-color: #E0E0E0;
+            --card-bg: #FFFFFF;
+            
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            
+            --spacing-container: 1200px;
+            --radius-sm: 8px;
+            --radius-pill: 100px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+
+        /* Utility */
+        .container {
+            max-width: var(--spacing-container);
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* --- Header --- */
+        header {
+            padding: 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background-color: rgba(247, 247, 245, 0.95);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .nav-wrapper { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 600; font-style: italic; }
+        .nav-links { display: none; gap: 2.5rem; }
+        .nav-links a { font-size: 0.9rem; font-weight: 500; position: relative; }
+        @media(min-width: 768px) { .nav-links { display: flex; } }
+
+        /* --- Place Header --- */
+        .place-hero {
+            padding: 6rem 0 3rem 0;
+            border-bottom: 1px solid var(--text-main);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .back-link:hover { color: var(--text-main); transform: translateX(-5px); }
+
+        .hero-split {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            align-items: end;
+        }
+
+        @media(min-width: 768px) {
+            .hero-split { grid-template-columns: 1.5fr 1fr; }
+        }
+
+        .place-title {
+            font-family: var(--font-serif);
+            font-size: 4.5rem;
+            line-height: 1;
+            margin-left: -4px; /* Optical alignment */
+        }
+        
+        .place-meta-text {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            max-width: 400px;
+            padding-bottom: 10px; /* Align with bottom of large text */
+        }
+
+        /* --- Filter Bar --- */
+        .filter-bar {
+            padding: 1.5rem 0;
+            display: flex;
+            gap: 1rem;
+            overflow-x: auto;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .filter-pill {
+            padding: 0.5rem 1.2rem;
+            border-radius: var(--radius-pill);
+            border: 1px solid var(--border-color);
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: pointer;
+            background: transparent;
+        }
+        
+        .filter-pill.active {
+            background: var(--text-main);
+            color: #fff;
+            border-color: var(--text-main);
+        }
+        
+        .filter-pill:hover:not(.active) {
+            background: #fff;
+            border-color: var(--text-main);
+        }
+
+        /* --- Scenario Grid --- */
+        .scenarios-section {
+            padding: 4rem 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media(min-width: 768px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media(min-width: 1024px) {
+            .grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        /* --- Scenario Card --- */
+        .scenario-card {
+            background: #fff;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 320px;
+            transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            cursor: pointer;
+        }
+
+        .scenario-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border-color: var(--text-main);
+        }
+
+        .card-top {
+            margin-bottom: 1rem;
+        }
+
+        .tags-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background: var(--bg-color);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .card-title {
+            font-family: var(--font-serif);
+            font-size: 1.75rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        .card-desc {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .card-footer {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--bg-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .meta-group {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .meta-item span {
+            margin-right: 4px;
+        }
+
+        /* The Button Circle */
+        .read-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--bg-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .scenario-card:hover .read-btn {
+            background: var(--accent-color);
+            transform: rotate(-45deg); /* Arrow points up-right */
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container nav-wrapper">
+            <a href="/" class="logo">Read Oral English.</a>
+            <nav class="nav-links">
+                <a href="/categories">Categories</a>
+                <a href="/places" style="border-bottom: 1px solid black;">Places</a>
+                <a href="/profile">My List</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <!-- Place Hero -->
+        <section class="place-hero">
+            <a href="/places?cat=home" class="back-link">&larr; Back to Home Category</a>
+            
+            <div class="hero-split">
+                <h1 class="place-title">Bedroom</h1>
+                <p class="place-meta-text">
+                    The intimate bookends of your day. Scenarios focused on waking up, getting dressed, winding down, and the quiet internal thoughts of the morning and night.
+                </p>
+            </div>
+        </section>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+            <button class="filter-pill active">All Scenarios</button>
+            <button class="filter-pill">Morning Routine</button>
+            <button class="filter-pill">Evening/Sleep</button>
+            <button class="filter-pill">Chores</button>
+            <button class="filter-pill">Emergency</button>
+        </div>
+
+        <!-- Scenarios Grid -->
+        <section class="scenarios-section">
+            <div class="grid">
+                
+                <!-- Card 1 -->
+                <a href="/stories/lost-keys" class="scenario-card">
+                    <div class="card-top">
+                        <div class="tags-row">
+                            <span class="tag">Morning</span>
+                            <span class="tag">Frustration</span>
+                        </div>
+                        <h3 class="card-title">Looking for Lost Keys in a Rush</h3>
+                        <p class="card-desc">
+                            You're running late and can't find your keys. Retracing steps, rummaging through drawers, and checking pockets while panicking.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="meta-group">
+                            <div class="meta-item">⏱ 4 min</div>
+                            <div class="meta-item">⚡ Beginner</div>
+                        </div>
+                        <div class="read-btn">&rarr;</div>
+                    </div>
+                </a>
+
+                <!-- Card 2 -->
+                <a href="/stories/snooze-alarm" class="scenario-card">
+                    <div class="card-top">
+                        <div class="tags-row">
+                            <span class="tag">Waking Up</span>
+                            <span class="tag">Internal Monologue</span>
+                        </div>
+                        <h3 class="card-title">The Battle with the Alarm Clock</h3>
+                        <p class="card-desc">
+                            Waking up groggy, hitting snooze repeatedly, and bargaining with yourself about getting out of bed.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="meta-group">
+                            <div class="meta-item">⏱ 3 min</div>
+                            <div class="meta-item">⚡ Easy</div>
+                        </div>
+                        <div class="read-btn">&rarr;</div>
+                    </div>
+                </a>
+
+                <!-- Card 3 -->
+                <a href="/stories/outfit-choice" class="scenario-card">
+                    <div class="card-top">
+                        <div class="tags-row">
+                            <span class="tag">Getting Ready</span>
+                            <span class="tag">Clothing</span>
+                        </div>
+                        <h3 class="card-title">Nothing to Wear</h3>
+                        <p class="card-desc">
+                            Staring at a full closet but feeling like you have no options. Trying on shirts, checking the mirror, and tossing clothes on the bed.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="meta-group">
+                            <div class="meta-item">⏱ 5 min</div>
+                            <div class="meta-item">⚡ Intermediate</div>
+                        </div>
+                        <div class="read-btn">&rarr;</div>
+                    </div>
+                </a>
+
+                <!-- Card 4 -->
+                <a href="/stories/packing-suitcase" class="scenario-card">
+                    <div class="card-top">
+                        <div class="tags-row">
+                            <span class="tag">Travel</span>
+                            <span class="tag">Organization</span>
+                        </div>
+                        <h3 class="card-title">Packing for a Trip</h3>
+                        <p class="card-desc">
+                            Deciding what to bring, folding clothes tightly, and trying to zip up an overstuffed suitcase.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="meta-group">
+                            <div class="meta-item">⏱ 6 min</div>
+                            <div class="meta-item">⚡ Intermediate</div>
+                        </div>
+                        <div class="read-btn">&rarr;</div>
+                    </div>
+                </a>
+
+                <!-- Card 5 -->
+                <a href="/stories/cant-sleep" class="scenario-card">
+                    <div class="card-top">
+                        <div class="tags-row">
+                            <span class="tag">Night</span>
+                            <span class="tag">Anxiety</span>
+                        </div>
+                        <h3 class="card-title">Tossing and Turning</h3>
+                        <p class="card-desc">
+                            You can't fall asleep. Checking the time on your phone, flipping the pillow to the cool side, and staring at the ceiling.
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="meta-group">
+                            <div class="meta-item">⏱ 4 min</div>
+                            <div class="meta-item">⚡ Advanced</div>
+                        </div>
+                        <div class="read-btn">&rarr;</div>
+                    </div>
+                </a>
+
+                <!-- Suggestion Card -->
+                <div class="scenario-card" style="border-style: dashed; justify-content: center; align-items: center; text-align: center; background: transparent;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">✍️</div>
+                    <h3 style="font-size: 1.2rem; margin-bottom: 0.5rem; font-family: var(--font-serif);">Request a Scenario</h3>
+                    <p style="font-size: 0.9rem; color: var(--text-muted);">Have a specific bedroom situation you want to learn?</p>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <footer>
+        <div class="container" style="text-align: center; color: var(--text-muted); padding: 2rem 0; border-top: 1px solid var(--border-color);">
+            <p style="font-size: 0.9rem;">Start reading. Start speaking.</p>
+        </div>
+    </footer>
+
+</body>
+</html>

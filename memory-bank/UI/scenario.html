@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looking for Lost Keys | Read Oral English</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Palette */
+            --bg-color: #F7F7F5;
+            --text-main: #111111;
+            --text-body: #2C2C2C;
+            --text-muted: #666666;
+            --accent-color: #D6E865; /* Acid Lime */
+            --accent-hover: #C5D950;
+            --border-color: #E0E0E0;
+            --surface-white: #FFFFFF;
+            
+            --font-display: 'Playfair Display', serif;
+            --font-ui: 'Inter', sans-serif;
+            --font-body: 'Georgia', serif; /* Classic reading font */
+            
+            --spacing-container: 1100px;
+            --radius-sm: 8px;
+            --radius-pill: 100px;
+            --nav-height: 70px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-ui);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        a { text-decoration: none; color: inherit; transition: 0.3s; }
+        button { border: none; background: none; cursor: pointer; font-family: inherit; }
+
+        /* Utility */
+        .container {
+            max-width: var(--spacing-container);
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* --- Header (Minimal) --- */
+        header {
+            height: var(--nav-height);
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            background: var(--bg-color);
+            position: relative;
+            z-index: 10;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .back-btn {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-btn:hover { color: var(--text-main); }
+
+        /* --- Main Layout: Story vs Sidebar --- */
+        .story-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            padding-top: 3rem;
+            padding-bottom: 8rem; /* Space for audio player */
+        }
+
+        @media(min-width: 900px) {
+            .story-layout {
+                grid-template-columns: 1fr 340px; /* Text takes space, Sidebar fixed width */
+                gap: 4rem;
+            }
+        }
+
+        /* --- Left Column: The Narrative --- */
+        .story-header {
+            margin-bottom: 2.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+        }
+
+        .meta-tags {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .story-title {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            line-height: 1.2;
+            margin-bottom: 1rem;
+        }
+
+        @media(min-width: 768px) {
+            .story-title { font-size: 3.5rem; }
+        }
+
+        .story-intro {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Reading Content Styling */
+        .story-content {
+            font-family: var(--font-body);
+            font-size: 1.25rem; /* Large, comfortable reading size */
+            line-height: 1.8;
+            color: var(--text-body);
+        }
+
+        .story-content p {
+            margin-bottom: 2rem;
+        }
+
+        /* THE INTERACTIVE HIGHLIGHT */
+        .term {
+            background: linear-gradient(180deg, rgba(255,255,255,0) 60%, var(--accent-color) 60%);
+            cursor: pointer;
+            padding: 0 2px;
+            border-radius: 2px;
+            transition: background 0.2s, color 0.2s;
+            position: relative;
+        }
+
+        .term:hover, .term.active {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        /* Internal Monologue Styling */
+        .thought {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        .thought::before { content: '“'; }
+        .thought::after { content: '”'; }
+
+        /* --- Right Column: Vocabulary Sidebar --- */
+        .sidebar-container {
+            display: none; /* Mobile: Hidden or moved below */
+        }
+
+        @media(min-width: 900px) {
+            .sidebar-container {
+                display: block;
+                position: relative;
+            }
+            
+            .sticky-wrapper {
+                position: sticky;
+                top: calc(var(--nav-height) + 2rem);
+                max-height: calc(100vh - 120px);
+                overflow-y: auto;
+                padding-right: 10px; /* scrollbar breathing room */
+            }
+        }
+
+        .vocab-panel {
+            background: var(--surface-white);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: 1.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+        }
+
+        .vocab-header {
+            font-family: var(--font-display);
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .vocab-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .vocab-item {
+            padding-bottom: 1rem;
+            border-bottom: 1px dashed var(--border-color);
+            transition: 0.3s;
+        }
+        
+        .vocab-item:last-child { border-bottom: none; }
+
+        .vocab-word {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-main);
+            margin-bottom: 0.25rem;
+            display: block;
+        }
+
+        .vocab-def {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .vocab-cn {
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: 4px;
+            display: block;
+            opacity: 0.8;
+        }
+
+        /* State: When hovering a word in text, highlight the sidebar item */
+        .vocab-item.highlighted {
+            background-color: #FAFAF8;
+            transform: translateX(-5px);
+            border-left: 3px solid var(--accent-color);
+            padding-left: 10px;
+        }
+
+        /* --- Sticky Audio Player (Bottom) --- */
+        .audio-dock {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
+            background: var(--text-main);
+            color: #fff;
+            border-radius: 60px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .play-btn {
+            width: 40px;
+            height: 40px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .play-btn:hover { background: var(--accent-color); }
+
+        .track-info {
+            flex-grow: 1;
+            margin: 0 1.5rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .track-title { font-size: 0.8rem; font-weight: 500; }
+        .track-progress { 
+            width: 100%; 
+            height: 3px; 
+            background: rgba(255,255,255,0.2); 
+            margin-top: 5px; 
+            border-radius: 2px;
+            position: relative;
+        }
+        
+        .progress-bar {
+            width: 35%;
+            height: 100%;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        .speed-toggle {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
+            font-weight: 600;
+        }
+        
+        .speed-toggle:hover { color: #fff; }
+
+        /* --- Mobile "View Vocab" Trigger --- */
+        .mobile-vocab-trigger {
+            display: block;
+            margin-top: 3rem;
+            background: #fff;
+            border: 1px solid var(--text-main);
+            width: 100%;
+            padding: 1rem;
+            text-align: center;
+            font-weight: 600;
+            border-radius: var(--radius-sm);
+        }
+        @media(min-width: 900px) { .mobile-vocab-trigger { display: none; } }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container nav-wrapper">
+            <a href="/scenarios?place=bedroom" class="back-btn">
+                &larr; Bedroom Scenarios
+            </a>
+            <div style="font-family: var(--font-display); font-style: italic;">Read Oral English.</div>
+            <div style="width: 100px; text-align: right;">
+                <!-- Placeholder for Profile/Settings -->
+                <span style="font-size: 1.2rem; cursor: pointer;">Aa</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="container story-layout">
+        
+        <!-- Left: Narrative -->
+        <article class="story-column">
+            
+            <div class="story-header">
+                <div class="meta-tags">
+                    <span>Bedroom</span> • <span>Morning Rush</span> • <span>4 Min</span>
+                </div>
+                <h1 class="story-title">Where did I put those keys?</h1>
+                <p class="story-intro">
+                    Panic sets in as the clock ticks closer to 8:30 AM. A classic morning struggle.
+                </p>
+            </div>
+
+            <div class="story-content">
+                <p>
+                    I checked my phone. 8:15 AM. <span class="thought">I am definitely going to be late.</span>
+                </p>
+
+                <p>
+                    I grabbed my backpack from the floor and swung it over my shoulder. Everything was ready—laptop, charger, lunch. But as I reached for the door handle, I realized my pockets felt light. Too light.
+                </p>
+
+                <p>
+                    I patted my jeans. Nothing. <span class="thought">Seriously? Not today.</span>
+                </p>
+
+                <p>
+                    I dropped my bag and ran back to the bedroom. I started to <span class="term" data-id="1">rummage through</span> the mess on my dresser. Old receipts, loose change, a few hair ties... but no keys.
+                </p>
+
+                <p>
+                    <span class="thought">Okay, retrace your steps,</span> I told myself. I <span class="term" data-id="2">came in</span> last night, tossed my jacket on the chair, and...
+                </p>
+
+                <p>
+                    I <span class="term" data-id="3">dashed over</span> to the chair and checked the jacket pockets. I pulled the pockets inside out. Empty. I felt a wave of heat rise up my neck.
+                </p>
+
+                <p>
+                    "Where on earth did I put them?" I <span class="term" data-id="4">muttered</span> under my breath.
+                </p>
+
+                <p>
+                    I got down on my knees to <span class="term" data-id="5">peer under</span> the bed. Maybe they fell off the nightstand? All I saw were dust bunnies and an old sock. I stood up and <span class="term" data-id="6">scanned the room</span> one more time.
+                </p>
+
+                <p>
+                    Then, I saw a glint of metal. They were <span class="term" data-id="7">sticking out</span> from under yesterday's jeans on the floor.
+                </p>
+
+                <p>
+                    I <span class="term" data-id="8">snatched them up</span>, let out a huge sigh of relief, and ran for the door.
+                </p>
+            </div>
+
+            <!-- Mobile Only Button -->
+            <button class="mobile-vocab-trigger">View Vocabulary List (8)</button>
+
+            <!-- Navigation Footer -->
+            <div style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between;">
+                <a href="#" style="color: var(--text-muted);">&larr; Previous Story</a>
+                <a href="/stories/snooze-alarm" style="font-weight: 600;">Next: The Alarm Battle &rarr;</a>
+            </div>
+
+        </article>
+
+        <!-- Right: Sticky Context Dictionary -->
+        <aside class="sidebar-container">
+            <div class="sticky-wrapper">
+                <div class="vocab-panel">
+                    <div class="vocab-header">
+                        <span>Key Phrases</span>
+                        <span style="font-size: 0.8rem; background: #eee; padding: 2px 6px; border-radius: 4px;">8 Items</span>
+                    </div>
+
+                    <div class="vocab-list">
+                        
+                        <!-- Item 1 -->
+                        <div class="vocab-item" id="vocab-1">
+                            <span class="vocab-word">rummage through</span>
+                            <div class="vocab-def">To search for something by moving things around carelessly.</div>
+                            <span class="vocab-cn">翻找 / 翻箱倒柜</span>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="vocab-item" id="vocab-2">
+                            <span class="vocab-word">come in</span>
+                            <div class="vocab-def">To enter a room or building (phrasal verb).</div>
+                            <span class="vocab-cn">进门 / 进来</span>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="vocab-item" id="vocab-3">
+                            <span class="vocab-word">dash over</span>
+                            <div class="vocab-def">To run or move somewhere very quickly.</div>
+                            <span class="vocab-cn">冲过去</span>
+                        </div>
+
+                        <!-- Item 4 -->
+                        <div class="vocab-item" id="vocab-4">
+                            <span class="vocab-word">mutter</span>
+                            <div class="vocab-def">To speak quietly so that it is difficult for others to hear, often when complaining.</div>
+                            <span class="vocab-cn">嘀咕 / 喃喃自语</span>
+                        </div>
+                        
+                        <!-- Item 5 -->
+                        <div class="vocab-item" id="vocab-5">
+                            <span class="vocab-word">peer under</span>
+                            <div class="vocab-def">To look closely or carefully at something, especially when it is hard to see.</div>
+                            <span class="vocab-cn">往...底下窥视</span>
+                        </div>
+
+                        <!-- Item 6 -->
+                        <div class="vocab-item" id="vocab-6">
+                            <span class="vocab-word">scan the room</span>
+                            <div class="vocab-def">To look through a place quickly to find something.</div>
+                            <span class="vocab-cn">扫视房间</span>
+                        </div>
+
+                         <!-- Item 7 -->
+                         <div class="vocab-item" id="vocab-7">
+                            <span class="vocab-word">stick out</span>
+                            <div class="vocab-def">To extend beyond the surface or edge of something; to be visible.</div>
+                            <span class="vocab-cn">伸出 / 露出来</span>
+                        </div>
+
+                        <!-- Item 8 -->
+                        <div class="vocab-item" id="vocab-8">
+                            <span class="vocab-word">snatch up</span>
+                            <div class="vocab-def">To take something quickly and roughly.</div>
+                            <span class="vocab-cn">一把抓起</span>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <!-- Practice Prompt -->
+                <div style="margin-top: 1.5rem; padding: 1rem; background: #E8E8E8; border-radius: var(--radius-sm); font-size: 0.9rem; color: var(--text-muted); text-align: center;">
+                    Try to use "Rummage through" in a sentence about your own bag.
+                </div>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- Floating Audio Player -->
+    <div class="audio-dock">
+        <button class="play-btn">
+            <svg width="14" height="16" viewBox="0 0 14 16" fill="currentColor">
+                <path d="M13 6.26795C14.3333 7.03775 14.3333 8.96225 13 9.73205L2.5 15.7942C1.16667 16.564 0.5 15.6018 0.5 14.0622L0.5 1.93782C0.5 0.398223 1.16667 -0.564024 2.5 0.205774L13 6.26795Z" />
+            </svg>
+        </button>
+        <div class="track-info">
+            <div class="track-title">Playing: Where did I put those keys?</div>
+            <div class="track-progress">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
+        <button class="speed-toggle">1.0x</button>
+    </div>
+
+    <script>
+        // Simple Interaction Script for Prototype
+        const terms = document.querySelectorAll('.term');
+        const vocabItems = document.querySelectorAll('.vocab-item');
+
+        terms.forEach(term => {
+            term.addEventListener('mouseenter', () => {
+                const id = term.getAttribute('data-id');
+                const target = document.getElementById(`vocab-${id}`);
+                
+                // Reset others
+                vocabItems.forEach(item => item.classList.remove('highlighted'));
+                
+                // Highlight target
+                if(target) {
+                    target.classList.add('highlighted');
+                    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

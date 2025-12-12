@@ -1,0 +1,38 @@
+Scenario: [Insert one scenario from the JSON]
+
+Task: Write a detailed, casual, realistic “daily life” article in American English for English learners. Describe every small movement, action, and object in a natural, conversational style — like narrating a YouTube vlog or talking to a friend.
+
+Tone & Style:
+
+Casual, friendly, American English
+
+Include tiny details: posture, hand movements, facial expressions, objects, water/sound, hair, etc.
+
+Include internal dialogue and filler words (uh, hmm, like, basically, whatever)
+
+Include humor and lighthearted reactions
+
+Content Requirements:
+
+Micro-actions & objects: Describe realistic movements (e.g., reaching for something, opening a drawer, sipping coffee, wiping a counter).
+
+Internal thoughts & dialogue: Show what the person is thinking or reacting to.
+
+Spoken English focus: Include phrasal verbs, idioms, and filler words Americans actually use.
+
+Length: 400–700 words.
+
+Optional: Provide Chinese translations for key spoken phrases.
+
+Output Structure:
+
+Title: [Scenario name] (Casual American English)
+
+Article: [Casual, realistic narrative with detailed actions, thoughts, and dialogue]
+
+Key Phrases & Words: [List highlighted movement verbs, objects, and idioms useful for conversation]
+
+Example:
+Scenario: “Looking for something lost in the room”
+
+Describe checking drawers, tossing cushions, peeking under the bed, muttering, getting frustrated, finding the object, celebrating.
