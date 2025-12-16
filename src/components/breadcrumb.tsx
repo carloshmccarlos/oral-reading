@@ -12,11 +12,17 @@ interface BreadcrumbProps {
   items: BreadcrumbItem[]
 }
 
+function getBreadcrumbItemKey (item: BreadcrumbItem, index: number) {
+  // Use href+label to avoid duplicate keys (e.g. "Home" can appear multiple times in a breadcrumb)
+  if (item.href) return `${item.href}::${item.label}`
+  return `${item.label}::${index}`
+}
+
 export function Breadcrumb ({ items }: BreadcrumbProps) {
   return (
     <nav className="text-xs font-medium uppercase tracking-widest text-text-muted">
       {items.map((item, index) => (
-        <span key={item.label}>
+        <span key={getBreadcrumbItemKey(item, index)}>
           {index > 0 && <span className="mx-2">/</span>}
           {item.href ? (
             <Link

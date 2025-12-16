@@ -30,6 +30,9 @@ export default async function CategoriesPage() {
   // Fetch all categories from database
   const categories = await getCategories()
 
+  // Only show a small preview set of places per category on this page.
+  const maxPlacesPerCategory = 8
+
   // Fetch places for each category with scenario counts
   const categoriesWithPlaces = await Promise.all(
     categories.map(async (category) => {
@@ -51,7 +54,6 @@ export default async function CategoriesPage() {
           in grammar tables.
         </p>
       </section>
-
       {/* Category sections */}
       {categoriesWithPlaces.map((category, index) => (
         <section
@@ -72,17 +74,28 @@ export default async function CategoriesPage() {
             </div>
 
             {/* Right: Places grid */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {category.places.map((place, placeIndex) => (
-                <PlaceCard
-                  key={place.id}
-                  name={place.name}
-                  slug={place.slug}
-                  categorySlug={category.slug}
-                  scenarioCount={place.scenarioCount}
-                  isPopular={placeIndex === 0 && place.scenarioCount > 3}
-                />
-              ))}
+            <div>
+              <div className="mb-4 flex items-center justify-end">
+                <Link
+                  href={`/scenarios?category=${category.slug}`}
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-text-main underline underline-offset-4 hover:text-text-body"
+                >
+                  View all
+                </Link>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                {category.places.slice(0, maxPlacesPerCategory).map((place, placeIndex) => (
+                  <PlaceCard
+                    key={place.id}
+                    name={place.name}
+                    slug={place.slug}
+                    categorySlug={category.slug}
+                    scenarioCount={place.scenarioCount}
+                    isPopular={placeIndex === 0 && place.scenarioCount > 3}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -99,6 +112,9 @@ export default async function CategoriesPage() {
           Request a Topic
         </Link>
       </div>
+
+      {/* Close the page wrapper opened at the start of the return block */}
     </div>
+
   )
 }

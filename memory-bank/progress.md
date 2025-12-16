@@ -194,3 +194,35 @@
 - `src/components/category-card.tsx` - Category card used on the Home page
 - `src/components/daily-scenario-card.tsx` - Daily scenario ("Today") card styling updates
 
+---
+
+## Phase 6: Story Model and Vocabulary ✅
+
+**Completed:** December 15, 2025
+
+### What was done:
+
+1. **Pilot Story + Vocabulary data**
+   - Added an idempotent pilot Story seed with a Markdown body.
+   - Seeded pilot Vocabulary Items (phrase + English meaning + optional Chinese + type) linked to the pilot Story.
+
+2. **Query support for story vocabulary**
+   - Added a query helper for fetching vocabulary items by `storyId` so the Story UI can render tooltips and the vocab list.
+
+3. **Story reading UI (interactive client component)**
+   - Added `StoryReader` to render paragraphs, internal thoughts (`*italic*`), and reading controls.
+   - Implemented translation visibility toggle and font size presets.
+
+4. **Vocabulary highlighting + tooltips (no list ↔ story sync)**
+   - Implemented pattern-matching highlights in the story body and tooltips for definitions.
+   - Kept the vocabulary list independent (no hover/focus linking between list items and highlighted terms).
+
+5. **Story page wiring**
+   - Updated the Story page route to fetch vocabulary items and render `StoryReader`.
+
+### Key Files Created/Updated:
+- `src/components/story-reader.tsx` - Reading UI, highlighting/tooltips, translation + font size controls
+- `src/app/stories/[slug]/page.tsx` - Story route wiring (scenario + vocabulary fetch)
+- `src/lib/db/queries.ts` - Added vocabulary query helper
+- `src/lib/db/seed.ts` - Pilot story + vocabulary seed
+

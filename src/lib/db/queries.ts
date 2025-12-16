@@ -3,7 +3,7 @@
 
 import { eq, count, asc } from 'drizzle-orm'
 import { db } from './client'
-import { categories, places, scenarios, stories } from './schema'
+import { categories, places, scenarios, stories, vocabularyItems } from './schema'
 
 // Fetch all categories with their place counts
 export async function getCategories () {
@@ -188,6 +188,23 @@ export async function getStoryByScenarioSlug (scenarioSlug: string) {
     .limit(1)
 
   return result[0] || null
+}
+
+export async function getVocabularyItemsByStoryId (storyId: string) {
+  const result = await db
+    .select({
+      id: vocabularyItems.id,
+      phrase: vocabularyItems.phrase,
+      meaningEn: vocabularyItems.meaningEn,
+      meaningZh: vocabularyItems.meaningZh,
+      type: vocabularyItems.type,
+      storyId: vocabularyItems.storyId
+    })
+    .from(vocabularyItems)
+    .where(eq(vocabularyItems.storyId, storyId))
+    .orderBy(asc(vocabularyItems.phrase))
+
+  return result
 }
 
 // Get today's scenario using sequential rotation based on date

@@ -1,4 +1,3 @@
-
 // Category card component for displaying categories in the home page context grid
 // Mirrors the "Pick a Context" card style from memory-bank/UI/home.html
 
@@ -15,7 +14,7 @@ const categoryMeta: Record<string, string> = {
   'Work & Offices': 'Desk, Break Room, Meetings...',
   Transportation: 'Subway, Bus, Taxi...',
   'Outdoors & Nature': 'Beach, Forest, Trail...',
-  Services: 'Bank, Post Office, Clinic...'
+  Services: 'Bank, Post Office, Clinic...',
 }
 
 interface CategoryCardProps {
@@ -26,13 +25,13 @@ interface CategoryCardProps {
   className?: string
 }
 
-export function CategoryCard ({ name, slug, icon, index, className }: CategoryCardProps) {
+export function CategoryCard({ name, slug, icon, index, className }: CategoryCardProps) {
   const formattedIndex = String(index).padStart(2, '0')
   const meta = categoryMeta[name] || 'Explore scenarios in this context.'
 
   return (
     <Link
-      href={`/places?category=${slug}`}
+      href={`/scenarios?category=${slug}`}
       className={cn(
         'group relative flex h-[250px] cursor-pointer flex-col justify-between rounded-sm border border-transparent bg-white p-8 transition-all',
         'hover:border-text-main hover:bg-accent',

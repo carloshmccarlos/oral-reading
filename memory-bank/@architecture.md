@@ -208,6 +208,7 @@ Reusable async functions for fetching data from the database:
 - **`getScenariosByPlace(placeId)`** - Returns scenarios for a place with category/place info
 - **`getScenariosByCategory(categoryId)`** - Returns all scenarios in a category
 - **`getStoryBySlug(slug)`** - Returns a story with its vocabulary items
+- **`getVocabularyItemsByStoryId(storyId)`** - Returns vocabulary items for a story (used by the Story reader)
 
 ## Page Components
 
@@ -230,7 +231,32 @@ Reusable async functions for fetching data from the database:
 4. **Story Page** (`/stories/[slug]`)
    - Two-column layout: story content + vocabulary sidebar
    - Reading typography with `.story-content`, `.term`, `.thought` classes
-   - Uses `getStoryBySlug()`
+   - Uses `getScenarioBySlug()` and `getVocabularyItemsByStoryId()`
+
+## Phase 6: Story Model + Vocabulary (Implementation Notes)
+
+### Pilot Content (Seed)
+
+- `src/lib/db/seed.ts` now inserts **one pilot Story** with a Markdown body and **pilot vocabulary items**.
+- The pilot Story is linked 1:1 to a seeded Scenario via `stories.scenario_id`.
+- Purpose: keep the seed idempotent while providing real data for Story rendering + highlights.
+
+### Story Rendering
+
+- `src/components/story-reader.tsx` is a **Client Component** responsible for:
+  - Rendering the Story body as paragraphs (split by blank lines)
+  - Minimal Markdown support: `*italic*` segments render as `.thought`
+  - Highlighting vocabulary phrases by pattern matching against the rendered text
+  - Tooltip definitions using the existing Radix/shadcn `Tooltip`
+  - Desktop vocabulary sidebar + mobile accordion list
+  - Reading controls: translation toggle (`Switch`) + font size (`Slider`)
+
+### Data Flow
+
+- Server Component: `src/app/stories/[slug]/page.tsx`
+  - Fetch scenario + story body via `getScenarioBySlug(slug)`
+  - Fetch vocabulary via `getVocabularyItemsByStoryId(storyId)`
+  - Pass data into `StoryReader` (client) for interactivity
 
 ## Rendering Strategy
 

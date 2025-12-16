@@ -6,7 +6,12 @@ import Link from 'next/link'
 import { Breadcrumb } from '@/components/breadcrumb'
 import { ScenarioCard } from '@/components/scenario-card'
 import { db } from '@/lib/db/client'
-import { getAllScenarios, getCategoryBySlug, getPlacesByCategory } from '@/lib/db/queries'
+import {
+  getAllScenarios,
+  getCategories,
+  getCategoryBySlug,
+  getPlacesByCategory,
+} from '@/lib/db/queries'
 import { categories, places, scenarios } from '@/lib/db/schema'
 
 export const metadata = {
@@ -24,6 +29,8 @@ export default async function ScenariosPage({ searchParams }: ScenariosPageProps
   const params = await searchParams
   const categorySlug = params.category
   const placeSlug = params.place
+
+  let allCategories: Awaited<ReturnType<typeof getCategories>> = []
 
   // Build query based on filters
   // biome-ignore lint/suspicious/noImplicitAnyLet: <explanation>
@@ -113,6 +120,10 @@ export default async function ScenariosPage({ searchParams }: ScenariosPageProps
     filteredScenarios = await getAllScenarios()
   }
 
+  if (!selectedCategory) {
+    allCategories = await getCategories()
+  }
+
   // Build breadcrumb items with explicit type for optional href
   const breadcrumbItems: Array<{ label: string; href?: string }> = [{ label: 'Home', href: '/' }]
   if (selectedCategory) {
@@ -135,11 +146,11 @@ export default async function ScenariosPage({ searchParams }: ScenariosPageProps
       ? selectedCategory.name
       : 'All Scenarios'
 
-  const pageDescription = selectedPlace
+  /* const pageDescription = selectedPlace
     ? `Explore scenarios set in ${selectedPlace.name}. Practice real English in context.`
     : selectedCategory
       ? `Browse all places and scenarios in the ${selectedCategory.name} category.`
-      : 'Pick a category and place to see scenario cards.'
+      : 'Pick a category and place to see scenario cards.'*/
 
   return (
     <div className="py-20">
@@ -156,40 +167,82 @@ export default async function ScenariosPage({ searchParams }: ScenariosPageProps
         )}
 
         <Breadcrumb items={breadcrumbItems} />
-
-        <div className="mt-6 grid grid-cols-1 items-end gap-8 md:grid-cols-[1.5fr_1fr]">
-          <h1 className="-ml-1 font-serif text-6xl leading-none md:text-7xl">{pageTitle}</h1>
+        <h1 className="mt-6 -ml-1 font-serif text-6xl leading-none md:text-7xl">{pageTitle}</h1>
+        {/* <div className="mt-6 grid grid-cols-1 items-end gap-8 md:grid-cols-[1.5fr_1fr]">
           <p className="pb-2 text-lg text-text-muted">{pageDescription}</p>
-        </div>
+        </div>*/}
       </section>
 
       {/* Filter Bar */}
-      {/* <div className="flex gap-4 overflow-x-auto border-b border-border py-6">
-        <Link
-          href="/scenarios"
-          className={`whitespace-nowrap rounded-pill border px-5 py-2 text-sm transition-colors ${
-            !categorySlug
-              ? 'border-text-main bg-text-main text-white'
-              : 'border-border bg-transparent hover:border-text-main hover:bg-white'
-          }`}
-        >
-          All Scenarios
-        </Link>
+      <section className="py-8">
+        {/* This filter bar is URL-driven: it updates /scenarios?category=...&place=... via Links */}
+        <nav aria-label="Scenario filters" className="space-y-4">
+          {!selectedCategory && (
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href="/scenarios"
+                className="whitespace-nowrap rounded-pill border border-text-main bg-text-main px-5 py-2 text-sm text-white transition-colors"
+              >
+                All Scenarios
+              </Link>
 
-        {allCategories.map((cat) => (
-          <Link
-            key={cat.id}
-            href={`/scenarios?category=${cat.slug}`}
-            className={`whitespace-nowrap rounded-pill border px-5 py-2 text-sm transition-colors ${
-              categorySlug === cat.slug
-                ? 'border-text-main bg-text-main text-white'
-                : 'border-border bg-transparent hover:border-text-main hover:bg-white'
-            }`}
-          >
-            {cat.name}
-          </Link>
-        ))}
-      </div>*/}
+              {allCategories.map((category) => (
+                <Link
+                  key={category.id}
+                  href={`/scenarios?category=${category.slug}`}
+                  className="whitespace-nowrap rounded-pill border border-border bg-white px-5 py-2 text-sm text-text-muted transition-colors hover:border-text-main hover:text-text-main"
+                >
+                  {category.name}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/*    {selectedCategory && (
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-text-muted">
+                Category:{' '}
+                <span className="font-semibold text-text-main">{selectedCategory.name}</span>
+              </p>
+              <Link
+                href="/scenarios"
+                className="text-sm font-semibold text-text-main underline underline-offset-4 hover:text-text-body"
+              >
+                Change category
+              </Link>
+            </div>
+          )}*/}
+
+          {selectedCategory && placesInCategory.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {/*<Link
+                href={`/scenarios?category=${selectedCategory.slug}`}
+                className={`whitespace-nowrap rounded-pill border px-5 py-2 text-sm transition-colors ${
+                  !selectedPlace
+                    ? 'border-text-main bg-text-main text-white'
+                    : 'border-border bg-white text-text-muted hover:border-text-main hover:text-text-main'
+                }`}
+              >
+                All Places
+              </Link>
+*/}
+              {placesInCategory.map((place) => (
+                <Link
+                  key={place.id}
+                  href={`/scenarios?category=${selectedCategory.slug}&place=${place.slug}`}
+                  className={`whitespace-nowrap rounded-pill border px-5 py-2 text-sm transition-colors ${
+                    selectedPlace?.slug === place.slug
+                      ? 'border-text-main bg-text-main text-white'
+                      : 'border-border bg-white text-text-muted hover:border-text-main hover:text-text-main'
+                  }`}
+                >
+                  {place.name}
+                </Link>
+              ))}
+            </div>
+          )}
+        </nav>
+      </section>
 
       {/* Scenarios Grid */}
       <section className="py-8">
