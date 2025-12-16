@@ -1,6 +1,7 @@
 export { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './accordion'
 export { Button, buttonVariants } from './button'
 export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card'
+export { Spinner } from './spinner'
 export { Slider } from './slider'
 export { Switch } from './switch'
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip'

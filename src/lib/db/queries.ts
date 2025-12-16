@@ -135,6 +135,27 @@ export async function getAllScenarios () {
   return result
 }
 
+export async function getScenariosByCategoryId (categoryId: string) {
+  const result = await db
+    .select({
+      id: scenarios.id,
+      slug: scenarios.slug,
+      title: scenarios.title,
+      shortDescription: scenarios.shortDescription,
+      categorySlug: categories.slug,
+      categoryName: categories.name,
+      placeSlug: places.slug,
+      placeName: places.name
+    })
+    .from(scenarios)
+    .innerJoin(categories, eq(scenarios.categoryId, categories.id))
+    .innerJoin(places, eq(scenarios.placeId, places.id))
+    .where(eq(scenarios.categoryId, categoryId))
+    .orderBy(asc(places.name), asc(scenarios.title))
+
+  return result
+}
+
 // Fetch a single scenario by slug with full details
 export async function getScenarioBySlug (slug: string) {
   const result = await db
