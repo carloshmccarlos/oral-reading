@@ -1,5 +1,5 @@
 import { db, pool } from './client'
-import { and, eq } from 'drizzle-orm'
+import { and, eq, sql } from 'drizzle-orm'
 import { categories, places, scenarios, stories, vocabularyItems } from './schema'
 
 import scenariors from '../../../memory-bank/scenariors'
@@ -65,6 +65,27 @@ function buildScenarioTitle (seedText: string, placeName: string) {
   return `${seedText} (${placeName})`
 }
 
+function joinUrl (baseUrl: string, path: string) {
+  const normalizedBase = baseUrl.replace(/\/+$/g, '')
+  const normalizedPath = path.replace(/^\/+/, '')
+  return `${normalizedBase}/${normalizedPath}`
+}
+
+function getPilotAudioUrl () {
+  if (process.env.PILOT_STORY_AUDIO_URL) {
+    return process.env.PILOT_STORY_AUDIO_URL
+  }
+
+  const publicBaseUrl = process.env.CLOUDFLARE_R2_PUBLIC_URL
+  const objectKey = process.env.PILOT_STORY_AUDIO_OBJECT_KEY || process.env.PILOT_STORY_AUDIO_KEY
+
+  if (!publicBaseUrl || !objectKey) {
+    return null
+  }
+
+  return joinUrl(publicBaseUrl, objectKey)
+}
+
 function getPilotStorySeed () {
   // Phase 6 pilot content:
   // - Provides one real story body (stored as Markdown) so the Story page and vocabulary UI are testable.
@@ -74,6 +95,8 @@ function getPilotStorySeed () {
     placeKey: 'Bedroom',
     seedText: 'Searching for a lost item',
     title: 'Where did I put those keys?',
+    // Set either PILOT_STORY_AUDIO_URL or CLOUDFLARE_R2_PUBLIC_URL + PILOT_STORY_AUDIO_OBJECT_KEY.
+    audioUrl: getPilotAudioUrl(),
     body: `I checked my phone. 8:15 AM. *I am definitely going to be late.*
 
 I grabbed my backpack from the floor and swung it over my shoulder. Everything was ready—laptop, charger, lunch. But as I reached for the door handle, I realized my pockets felt light. Too light.
@@ -251,7 +274,7 @@ async function main () {
               slug: scenarioRow.slug,
               title: pilot.title,
               body: pilot.body,
-              audioUrl: null,
+              audioUrl: pilot.audioUrl,
               scenarioId: scenarioRow.id
             })
             .onConflictDoUpdate({
@@ -260,7 +283,7 @@ async function main () {
                 slug: scenarioRow.slug,
                 title: pilot.title,
                 body: pilot.body,
-                audioUrl: null,
+                audioUrl: sql`coalesce(${stories.audioUrl}, ${pilot.audioUrl})`,
                 updatedAt: new Date()
               }
             })

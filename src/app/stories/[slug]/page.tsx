@@ -3,6 +3,7 @@
 
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { StoryAudioDock } from '@/components/story-audio-dock'
 import { StoryReader } from '@/components/story-reader'
 import { getScenarioBySlug, getVocabularyItemsByStoryId } from '@/lib/db/queries'
 
@@ -100,26 +101,12 @@ export default async function StoryPage ({ params }: StoryPageProps) {
         </div>
       </main>
 
-      {/* Audio player dock (placeholder) */}
+      {/* Audio dock: plays the story narration from a Cloudflare R2 (public) URL. */}
       {scenario.audioUrl && (
-        <div className="fixed bottom-5 left-1/2 z-50 flex w-[90%] max-w-[600px] -translate-x-1/2 items-center justify-between rounded-[60px] bg-text-main px-5 py-2.5 text-white shadow-[0_10px_30px_rgba(0,0,0,0.2)]">
-          <button type="button" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-black hover:bg-accent">
-            ▶
-          </button>
-
-          <div className="mx-6 flex grow flex-col justify-center">
-            <div className="text-sm font-medium">
-              Playing: {scenario.storyTitle || scenario.title}
-            </div>
-            <div className="mt-1 h-[3px] w-full rounded bg-white/20">
-              <div className="h-full w-[35%] rounded bg-accent" />
-            </div>
-          </div>
-
-          <button type="button" className="text-xs font-semibold text-white/70 hover:text-white">
-            1.0x
-          </button>
-        </div>
+        <StoryAudioDock
+          src={scenario.audioUrl}
+          title={scenario.storyTitle || scenario.title}
+        />
       )}
     </div>
   )
