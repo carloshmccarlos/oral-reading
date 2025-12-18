@@ -99,7 +99,7 @@
 2. **Navigation Structure**
    - Added header + footer navigation components
    - Final nav requirement implemented: only **About** and **Start Reading** are exposed (logo still links Home)
-   - Start Reading navigates to `/scenarios`
+   - Start Reading navigates to `/categories`
 
 3. **Reading-Friendly Typography Baseline**
    - Added global heading typography baseline in `src/app/globals.css` to match the static HTML prototypes
@@ -115,13 +115,12 @@
 - `src/app/globals.css`
 - `src/app/about/page.tsx`
 - `src/app/categories/page.tsx`
-- `src/app/places/page.tsx`
 - `src/app/scenarios/page.tsx`
 - `src/app/today/page.tsx`
 
 ---
 
-## Phase 4: Content Browsing Flows (Categories, Places, Scenarios) ✅
+## Phase 4: Content Browsing Flows (Categories, Scenarios) ✅
 
 **Completed:** December 12, 2025
 
@@ -131,27 +130,23 @@
    - Created `src/lib/db/queries.ts` with reusable query functions for fetching categories, places, scenarios, and stories
    - Functions include: `getCategories`, `getPlacesByCategory`, `getScenariosByPlace`, `getStoryBySlug`
 
-2. **Categories Page (`/categories`)**
+2. **Categories Page (`/categories`)** 
    - Implemented directory layout matching `memory-bank/UI/categories.html`
    - Displays all categories with their places in a grid layout
    - Each category section has a left label block (index, heading, description) and right place cards grid
    - Category descriptions seeded to database via `src/lib/db/seed.ts`
 
-3. **Places Page (`/places`)**
-   - URL-based filtering by category using search parameters
-   - Responsive grid of place cards with scenario counts
-
-4. **Scenarios Page (`/scenarios`)**
+3. **Scenarios Page (`/scenarios`)** 
    - URL-based filtering by category and place
    - Scenario cards with title, tags, description, and meta info
    - Links to corresponding story pages
 
-5. **Story Detail Page (`/stories/[slug]`)**
+4. **Story Detail Page (`/stories/[slug]`)** 
    - Two-column layout: story content (left) + vocabulary sidebar (right)
    - Reading typography styles for narrative text
    - Supports `.term` and `.thought` inline styling classes
 
-6. **Reusable Components**
+5. **Reusable Components**
    - `Breadcrumb` - hierarchical navigation trail
    - `PlaceCard` - card for displaying places with scenario counts
    - `ScenarioCard` - card for displaying scenarios with metadata
@@ -159,7 +154,6 @@
 ### Key Files Created/Updated:
 - `src/lib/db/queries.ts` - Database query helpers
 - `src/app/categories/page.tsx` - Categories directory page
-- `src/app/places/page.tsx` - Places listing with filtering
 - `src/app/scenarios/page.tsx` - Scenarios listing with filtering
 - `src/app/stories/[slug]/page.tsx` - Story detail page
 - `src/components/breadcrumb.tsx` - Breadcrumb navigation
@@ -226,3 +220,74 @@
 - `src/lib/db/queries.ts` - Added vocabulary query helper
 - `src/lib/db/seed.ts` - Pilot story + vocabulary seed
 
+
+---
+
+## Phase 7: Audio Narration Integration 
+**Completed:** December 16, 2025
+
+### What was done:
+
+1. **R2 narration playback dock (client component)**
+   - Added `StoryAudioDock` using native HTML audio with play/pause, seeking, duration display, and playback speed cycling.
+   - Designed to appear as a fixed bottom dock only when a Story has an `audioUrl`.
+
+2. **Story page wiring for audio**
+   - Replaced the previous placeholder audio dock on the Story page.
+   - The Story page now renders the dock when `stories.audio_url` exists.
+
+3. **Pilot story audio URL seeding support (R2 public URL)**
+   - Added env-driven pilot audio URL support so the pilot Story can be seeded with an R2 public audio URL.
+   - Implemented safe reseeding so an existing `audio_url` is not overwritten.
+
+4. **Generated a sample MP3 for R2 upload**
+   - Created `memory-bank/r2-test-tone.mp3` as a small test asset for validating R2 audio playback.
+
+### Key Files Created/Updated:
+- `src/components/story-audio-dock.tsx` - Audio playback dock (play/pause/seek/speed)
+- `src/app/stories/[slug]/page.tsx` - Uses `StoryAudioDock` when audio exists
+- `src/lib/db/seed.ts` - Supports `CLOUDFLARE_R2_PUBLIC_URL` + `PILOT_STORY_AUDIO_OBJECT_KEY` (and preserves existing audio)
+- `memory-bank/r2-test-tone.mp3` - Sample audio file for R2
+
+---
+
+## Phase 8: About Page 
+
+**Completed:** December 16, 2025
+
+### What was done:
+
+1. **About page prototype parity (about.html)**
+   - Implemented the About page layout and content using `memory-bank/UI/about.html` as the visual reference.
+   - Included the full page structure: hero mission section, dark "problem" section, method/legend section, features grid, and signature/CTA.
+
+2. **Help content: highlight + translation behavior**
+   - Added a dedicated explanation section describing how highlights work and how the translation toggle affects tooltips and the phrase list.
+
+### Key Files Created/Updated:
+- `src/app/about/page.tsx` - About / Help page implementation (prototype parity)
+
+---
+
+## Phase 9: Cron Story Generation Scheduling ✅
+
+**Completed:** December 18, 2025
+
+### What was done:
+
+1. **Cron endpoint: process exactly one job per call**
+   - Enforced a strict `limit = 1` contract so each cron invocation generates at most one story.
+   - Any incoming `limit` from request body is capped to 1 and overridden to 1.
+
+2. **Cron authorization: support Vercel scheduled calls + manual triggers**
+   - Added shared `isCronAuthorized()` helper.
+   - Accepts either:
+     - `Authorization: Bearer <CRON_SECRET>` (manual trigger)
+     - `x-vercel-cron: 1` / `true` (Vercel Cron scheduler)
+
+3. **Vercel Cron schedule: every 10 minutes**
+   - Confirmed `vercel.json` is configured to call `/api/cron/generate-stories` on `*/10 * * * *`.
+
+### Key Files Updated:
+- `src/app/api/cron/generate-stories/route.ts` - Enforced one-job-per-call + Vercel cron auth support
+- `vercel.json` - Cron schedule (every 10 minutes)

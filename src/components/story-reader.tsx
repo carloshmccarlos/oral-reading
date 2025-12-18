@@ -77,11 +77,17 @@ function parseMarkdownParagraph (paragraph: string) {
 function buildHighlightedNodes ({
   text,
   vocabularyItems,
-  isTranslationsVisible
+  isTranslationsVisible,
+  openTermKey,
+  onSetOpenTermKey,
+  shouldUseClickToOpen
 }: {
   text: string
   vocabularyItems: VocabularyItem[]
   isTranslationsVisible: boolean
+  openTermKey: string | null
+  onSetOpenTermKey: (value: string | null) => void
+  shouldUseClickToOpen: boolean
 }) {
   // Highlight vocabulary phrases inside the story article.
   // This does NOT sync with the vocabulary list (no cross-linking).
@@ -144,18 +150,51 @@ function buildHighlightedNodes ({
     }
 
     const matchedText = text.slice(bestMatch.index, bestMatch.endIndex)
+    const termKey = `${bestMatch.item.id}:${bestMatch.index}:${bestMatch.endIndex}`
 
     nodes.push(
-      <Tooltip key={`h:${bestMatch.item.id}:${bestMatch.index}:${bestMatch.endIndex}`}>
+      <Tooltip
+        key={`h:${termKey}`}
+        open={openTermKey === termKey}
+        onOpenChange={(nextOpen) => {
+          if (shouldUseClickToOpen) {
+            return
+          }
+
+          if (nextOpen) {
+            onSetOpenTermKey(termKey)
+            return
+          }
+
+          if (openTermKey === termKey) {
+            onSetOpenTermKey(null)
+          }
+        }}
+      >
         <TooltipTrigger asChild>
           <button
             type="button"
             className="term inline appearance-none border-0 bg-transparent"
+            data-term-trigger="true"
+            onPointerDown={(event) => {
+              if (!shouldUseClickToOpen) {
+                return
+              }
+
+              event.stopPropagation()
+
+              if (openTermKey === termKey) {
+                onSetOpenTermKey(null)
+                return
+              }
+
+              onSetOpenTermKey(termKey)
+            }}
           >
             {matchedText}
           </button>
         </TooltipTrigger>
-        <TooltipContent>
+        <TooltipContent data-term-tooltip="true">
           <div className="space-y-1">
             <div className="text-sm font-semibold">{bestMatch.item.phrase}</div>
             {bestMatch.item.type && (
@@ -179,6 +218,58 @@ function buildHighlightedNodes ({
 export function StoryReader ({ body, vocabularyItems, footer }: StoryReaderProps) {
   const [isTranslationsVisible, setIsTranslationsVisible] = React.useState(true)
   const [fontSizeStep, setFontSizeStep] = React.useState(1)
+  const [openTermKey, setOpenTermKey] = React.useState<string | null>(null)
+  const [shouldUseClickToOpen, setShouldUseClickToOpen] = React.useState(false)
+
+  React.useEffect(() => {
+    // On mobile/coarse pointers there is no hover, so make definition tooltips open on tap.
+    const media = window.matchMedia('(hover: none), (pointer: coarse)')
+
+    function update() {
+      setShouldUseClickToOpen(Boolean(media.matches))
+    }
+
+    update()
+
+    if (typeof media.addEventListener === 'function') {
+      media.addEventListener('change', update)
+      return () => media.removeEventListener('change', update)
+    }
+
+    media.addListener(update)
+    return () => media.removeListener(update)
+  }, [])
+
+  React.useEffect(() => {
+    if (!shouldUseClickToOpen) {
+      return
+    }
+
+    function handlePointerDown (event: PointerEvent) {
+      if (!openTermKey) {
+        return
+      }
+
+      const target = event.target
+      if (!(target instanceof Element)) {
+        setOpenTermKey(null)
+        return
+      }
+
+      if (target.closest('[data-term-trigger="true"]')) {
+        return
+      }
+
+      if (target.closest('[data-term-tooltip="true"]')) {
+        return
+      }
+
+      setOpenTermKey(null)
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => document.removeEventListener('pointerdown', handlePointerDown)
+  }, [openTermKey, shouldUseClickToOpen])
 
   const fontSizeRem = React.useMemo(() => {
     const remSizes = [1.125, 1.25, 1.375]
@@ -193,6 +284,40 @@ export function StoryReader ({ body, vocabularyItems, footer }: StoryReaderProps
 
     return normalizedBody.split(/\n\n+/g).map((p) => p.trim()).filter(Boolean)
   }, [normalizedBody])
+
+  const orderedVocabularyItems = React.useMemo(() => {
+    if (!normalizedBody || vocabularyItems.length === 0) {
+      return vocabularyItems
+    }
+
+    const displayText = paragraphs
+      .map((paragraph) => parseMarkdownParagraph(paragraph).map((token) => token.value).join(''))
+      .join('\n\n')
+
+    const displayTextLower = displayText.toLowerCase()
+
+    function getFirstAppearanceIndex (phrase: string) {
+      const trimmed = phrase.trim()
+      if (!trimmed) {
+        return Number.POSITIVE_INFINITY
+      }
+
+      const match = findNextValidMatch(displayTextLower, trimmed.toLowerCase(), 0)
+      return match?.index ?? Number.POSITIVE_INFINITY
+    }
+
+    return [...vocabularyItems]
+      .sort((a, b) => {
+        const aIndex = getFirstAppearanceIndex(a.phrase)
+        const bIndex = getFirstAppearanceIndex(b.phrase)
+
+        if (aIndex === bIndex) {
+          return a.phrase.localeCompare(b.phrase)
+        }
+
+        return aIndex - bIndex
+      })
+  }, [normalizedBody, paragraphs, vocabularyItems])
 
   if (!normalizedBody) {
     return (
@@ -214,7 +339,7 @@ export function StoryReader ({ body, vocabularyItems, footer }: StoryReaderProps
           <div id="reading-settings" className="mb-8 flex flex-col gap-4 rounded-sm border border-border bg-white p-4 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center justify-between gap-4">
               <div className="text-sm font-semibold">Reading settings</div>
-              <div className="text-sm text-text-muted">{vocabularyItems.length} phrases</div>
+              <div className="text-sm text-text-muted">{orderedVocabularyItems.length} phrases</div>
             </div>
 
             <div className="flex flex-col gap-4 md:flex-row md:items-center">
@@ -247,7 +372,10 @@ export function StoryReader ({ body, vocabularyItems, footer }: StoryReaderProps
             </div>
           </div>
 
-          <div className="story-content font-body text-xl leading-relaxed text-text-body" style={{ fontSize: `${fontSizeRem}rem` }}>
+          <div
+            className="story-content font-body text-xl leading-relaxed text-text-body"
+            style={{ fontSize: `${fontSizeRem}rem` }}
+          >
             {paragraphs.map((paragraph, paragraphIndex) => {
               const tokens = parseMarkdownParagraph(paragraph)
               const key = buildStableKey(`${paragraphIndex}:${paragraph}`)
@@ -267,8 +395,11 @@ export function StoryReader ({ body, vocabularyItems, footer }: StoryReaderProps
                       <React.Fragment key={token.key}>
                         {buildHighlightedNodes({
                           text: token.value,
-                          vocabularyItems,
-                          isTranslationsVisible
+                          vocabularyItems: orderedVocabularyItems,
+                          isTranslationsVisible,
+                          openTermKey,
+                          onSetOpenTermKey: setOpenTermKey,
+                          shouldUseClickToOpen
                         })}
                       </React.Fragment>
                     )
@@ -289,7 +420,7 @@ export function StoryReader ({ body, vocabularyItems, footer }: StoryReaderProps
                     {vocabularyItems.length === 0 ? (
                       <div className="text-sm text-text-muted">No vocabulary items yet.</div>
                     ) : (
-                      vocabularyItems.map((item) => (
+                      orderedVocabularyItems.map((item) => (
                         <div key={item.id} className="rounded-sm border border-border bg-white p-4">
                           <div className="font-semibold">{item.phrase}</div>
                           <div className="text-sm text-text-muted">{item.meaningEn}</div>
@@ -309,33 +440,38 @@ export function StoryReader ({ body, vocabularyItems, footer }: StoryReaderProps
         </div>
 
         <aside className="hidden lg:block">
-          <div className="sticky top-[calc(var(--nav-height)+2rem)]">
-            <div className="rounded-sm border border-border bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
-              <div className="mb-6 flex items-center justify-between font-serif text-xl">
-                <span>Key Phrases</span>
-                <span className="rounded bg-[#eee] px-2 py-0.5 text-sm">{vocabularyItems.length} Items</span>
+          <div className="sticky top-[calc(var(--nav-height)+2rem)] h-[calc(100vh-var(--nav-height)-2rem)]">
+            {/* Keep the vocab panel the same visible height as the article section (viewport minus header offset). */}
+            <div className="flex h-full flex-col gap-6">
+              <div className="flex flex-1 flex-col overflow-hidden rounded-sm border border-border bg-white p-6 shadow-[0_4px_20px_rgba(0,0,0,0.03)]">
+                <div className="mb-6 flex items-center justify-between font-serif text-xl">
+                  <span>Key Phrases</span>
+                  <span className="rounded bg-[#eee] px-2 py-0.5 text-sm">{vocabularyItems.length} Items</span>
+                </div>
+
+                {/* Story highlighting is enabled, but the vocabulary list does not link/sync to the story text. */}
+                {vocabularyItems.length === 0 ? (
+                  <p className="text-sm text-text-muted">Vocabulary items will appear here once the story content is added.</p>
+                ) : (
+                  <div className="min-h-0 flex-1 overflow-y-auto pr-2">
+                    <div className="space-y-4">
+                      {orderedVocabularyItems.map((item) => (
+                        <div key={item.id} className="rounded-sm bg-[#FAFAF8] p-3">
+                          <div className="font-semibold text-text-main">{item.phrase}</div>
+                          <div className="text-sm text-text-muted">{item.meaningEn}</div>
+                          {isTranslationsVisible && item.meaningZh && (
+                            <div className="mt-1 text-sm text-text-muted">{item.meaningZh}</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Story highlighting is enabled, but the vocabulary list does not link/sync to the story text. */}
-              {vocabularyItems.length === 0 ? (
-                <p className="text-sm text-text-muted">Vocabulary items will appear here once the story content is added.</p>
-              ) : (
-                <div className="space-y-4">
-                  {vocabularyItems.map((item) => (
-                    <div key={item.id} className="rounded-sm bg-[#FAFAF8] p-3">
-                      <div className="font-semibold text-text-main">{item.phrase}</div>
-                      <div className="text-sm text-text-muted">{item.meaningEn}</div>
-                      {isTranslationsVisible && item.meaningZh && (
-                        <div className="mt-1 text-sm text-text-muted">{item.meaningZh}</div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            <div className="mt-6 rounded-sm bg-[#E8E8E8] p-4 text-center text-sm text-text-muted">
-              Practice tip: Try reading the story aloud to improve pronunciation.
+              <div className="shrink-0 rounded-sm bg-[#E8E8E8] p-4 text-center text-sm text-text-muted">
+                Practice tip: Try reading the story aloud to improve pronunciation.
+              </div>
             </div>
           </div>
         </aside>

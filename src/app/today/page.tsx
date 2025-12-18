@@ -1,5 +1,5 @@
 export const metadata = {
-  title: "Today's Scenario | Read Oral English",
+  title: "Today's Scenario",
 }
 
 export default function TodayPage () {

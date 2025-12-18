@@ -7,7 +7,9 @@ import { PlaceCard } from '@/components/place-card'
 import { getCategories, getPlacesByCategory } from '@/lib/db/queries'
 
 export const metadata = {
-  title: 'Categories | Read Oral English',
+  title: 'Categories',
+  description: 'Browse everyday contexts and places to find realistic stories for spoken English practice.',
+  alternates: { canonical: '/categories' }
 }
 
 // Category index labels for visual hierarchy

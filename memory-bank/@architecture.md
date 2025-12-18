@@ -11,8 +11,6 @@ oral-reading/
 │   │   ├── page.tsx            # Home page
 │   │   ├── categories/
 │   │   │   └── page.tsx        # Categories directory page
-│   │   ├── places/
-│   │   │   └── page.tsx        # Places listing with category filter
 │   │   ├── scenarios/
 │   │   │   └── page.tsx        # Scenarios listing with filters
 │   │   ├── stories/
@@ -34,6 +32,7 @@ oral-reading/
 │   │   │   ├── switch.tsx      # Toggle for translations
 │   │   │   ├── slider.tsx      # Font size control
 │   │   │   └── accordion.tsx   # Collapsible vocabulary panel
+│   │   ├── story-audio-dock.tsx # Story narration audio dock (client)
 │   │   ├── site-header.tsx     # Global header with navigation
 │   │   ├── site-nav.tsx        # Navigation links component
 │   │   ├── site-footer.tsx     # Global footer
@@ -65,7 +64,6 @@ oral-reading/
 ├── playwright.config.ts        # E2E test config
 ├── tsconfig.json               # TypeScript config
 └── package.json
-```
 
 ## Data Layer (PostgreSQL + Drizzle)
 
@@ -84,6 +82,13 @@ oral-reading/
 - `DATABASE_URL`
   - Used by both `drizzle-kit` (migrations) and the runtime DB client.
   - The Node-run scripts (like `db:seed`) load env from `.env.local` first, then `.env`.
+- `CLOUDFLARE_R2_PUBLIC_URL`
+  - Optional base URL used by the seed script to construct a public audio URL for the pilot story.
+- `PILOT_STORY_AUDIO_OBJECT_KEY`
+  - Optional R2 object key (path) for the pilot story audio.
+  - Used together with `CLOUDFLARE_R2_PUBLIC_URL`.
+- `PILOT_STORY_AUDIO_URL`
+  - Optional full public URL for the pilot story audio (overrides the base URL + object key approach).
 
 ### Scripts
 
@@ -219,19 +224,18 @@ Reusable async functions for fetching data from the database:
    - Each section: left label block + right place cards grid
    - Uses `getCategories()` and `getPlacesByCategory()`
 
-2. **Places Page** (`/places?category=slug`)
-   - URL-filtered listing of places
-   - Uses search params for category filtering
-
-3. **Scenarios Page** (`/scenarios?category=slug&place=slug`)
+2. **Scenarios Page** (`/scenarios?category=slug&place=slug`)
    - URL-filtered listing of scenarios
-   - Filter bar for category selection
-   - Uses search params for category/place filtering
+   - Client-side place filter updates state and keeps the URL in sync
 
-4. **Story Page** (`/stories/[slug]`)
+3. **Story Page** (`/stories/[slug]`)
    - Two-column layout: story content + vocabulary sidebar
    - Reading typography with `.story-content`, `.term`, `.thought` classes
    - Uses `getScenarioBySlug()` and `getVocabularyItemsByStoryId()`
+
+4. **About Page** (`/about`)
+   - Static help/method page aligned to `memory-bank/UI/about.html`
+   - Explains the site approach, phrase highlights, translations, and audio shadowing
 
 ## Phase 6: Story Model + Vocabulary (Implementation Notes)
 
@@ -258,6 +262,16 @@ Reusable async functions for fetching data from the database:
   - Fetch vocabulary via `getVocabularyItemsByStoryId(storyId)`
   - Pass data into `StoryReader` (client) for interactivity
 
+## Phase 7: Audio Narration (Implementation Notes)
+
+- `stories.audio_url` stores a public URL to a narration audio file (Cloudflare R2 recommended).
+- Story playback UI is handled by `src/components/story-audio-dock.tsx` (Client Component) using native HTML audio.
+- The Story page (`src/app/stories/[slug]/page.tsx`) renders the dock only when `audioUrl` is present.
+- `src/lib/db/seed.ts` supports setting pilot story audio via:
+  - `PILOT_STORY_AUDIO_URL`, or
+  - `CLOUDFLARE_R2_PUBLIC_URL` + `PILOT_STORY_AUDIO_OBJECT_KEY`
+- Reseeding is designed to preserve an existing `audio_url` rather than overwriting it.
+
 ## Rendering Strategy
 
 - Server Components by default.
@@ -266,6 +280,71 @@ Reusable async functions for fetching data from the database:
 ## Linting / Formatting
 
 - Biome is the linter/formatter.
+
+## Phase 8: Cron Story + Audio Generation (Implementation Notes)
+
+### Overview
+
+Automated pipeline to generate stories and audio narration for all scenarios:
+
+- **Cron endpoint**: `POST /api/cron/generate-stories`
+- **Scheduler**: Vercel Cron (every 10 minutes via `vercel.json`)
+- **AI model**: SiliconFlow `Qwen/Qwen3-Omni-30B-A3B-Instruct` for story generation
+- **TTS**: SiliconFlow TTS endpoint for audio narration
+- **Storage**: Cloudflare R2 at `stories/audio/<scenarioSlug>.mp3`
+
+### New Files
+
+- `src/lib/r2.ts` - R2 upload utility using AWS SDK v3
+- `src/lib/siliconflow.ts` - SiliconFlow client for story generation + TTS
+- `src/lib/generation-pipeline.ts` - Orchestrates story → audio → upload → DB
+- `src/lib/db/jobs.ts` - Job queue helpers (claim, mark success/fail, etc.)
+- `src/app/api/cron/generate-stories/route.ts` - Protected cron endpoint
+- `src/app/admin/page.tsx` - Admin dashboard for job monitoring
+- `vercel.json` - Vercel Cron configuration
+
+### New Table: `story_generation_jobs`
+
+- **Columns**
+  - **`id`**: `text` (PK, default UUID)
+  - **`scenario_id`**: `text` (NOT NULL, UNIQUE)
+  - **`status`**: `text` (NOT NULL, default 'queued') - queued | running | succeeded | failed
+  - **`attempt_count`**: `integer` (NOT NULL, default 0)
+  - **`locked_at`**: `timestamp with time zone` (NULL)
+  - **`locked_by`**: `text` (NULL)
+  - **`last_error`**: `text` (NULL)
+  - **`last_attempt_at`**: `timestamp with time zone` (NULL)
+  - **`created_at`**: `timestamp with time zone` (NOT NULL, default now)
+  - **`updated_at`**: `timestamp with time zone` (NOT NULL, default now)
+
+- **Indexes**
+  - `story_generation_jobs_status_idx` on (`status`)
+
+### Environment Variables (new)
+
+- `SILICONFLOW_API_KEY` - API key for SiliconFlow
+- `SILICONFLOW_STORY_MODEL` - Model for story generation (default: `Qwen/Qwen3-Omni-30B-A3B-Instruct`)
+- `SILICONFLOW_TTS_MODEL` - Model for TTS audio generation
+- `CLOUDFLARE_R2_ACCOUNT_ID` - R2 account ID
+- `CLOUDFLARE_R2_ACCESS_KEY_ID` - R2 access key
+- `CLOUDFLARE_R2_SECRET_ACCESS_KEY` - R2 secret key
+- `CLOUDFLARE_R2_BUCKET_NAME` - R2 bucket name
+- `CRON_SECRET` - Secret for authenticating cron requests
+- `ADMIN_SECRET` - Secret for protecting `/admin` (login form sets httpOnly cookie)
+
+### Pipeline Flow
+
+1. Cron endpoint receives request (authenticated via `CRON_SECRET` or Vercel Cron header `x-vercel-cron`)
+2. Create jobs for any scenarios missing stories
+3. Loop: claim one job → generate story → generate audio → upload to R2 → upsert DB → mark succeeded
+4. Failed jobs stay `queued` for automatic retry (up to 3 attempts)
+5. Default limit: 1 scenario per cron run
+
+### Admin Page
+
+- Route: `/admin`
+- Displays job status counts (queued/running/succeeded/failed)
+- Shows job table with scenario, status, attempts, errors, timestamps
 
 ## Notes
 

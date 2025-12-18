@@ -1,9 +1,37 @@
 // Database query helpers for fetching categories, places, and scenarios
 // These are used by server components to fetch data from the database
 
-import { eq, count, asc } from 'drizzle-orm'
+import { eq, count, asc, isNotNull } from 'drizzle-orm'
 import { db } from './client'
 import { categories, places, scenarios, stories, vocabularyItems } from './schema'
+
+// Get data summary counts for admin dashboard
+export async function getDataSummary () {
+  const [
+    categoryCount,
+    placeCount,
+    scenarioCount,
+    storyCount,
+    storiesWithAudio,
+    vocabularyCount
+  ] = await Promise.all([
+    db.select({ count: count() }).from(categories),
+    db.select({ count: count() }).from(places),
+    db.select({ count: count() }).from(scenarios),
+    db.select({ count: count() }).from(stories),
+    db.select({ count: count() }).from(stories).where(isNotNull(stories.audioUrl)),
+    db.select({ count: count() }).from(vocabularyItems)
+  ])
+
+  return {
+    categories: categoryCount[0]?.count || 0,
+    places: placeCount[0]?.count || 0,
+    scenarios: scenarioCount[0]?.count || 0,
+    stories: storyCount[0]?.count || 0,
+    storiesWithAudio: storiesWithAudio[0]?.count || 0,
+    vocabularyItems: vocabularyCount[0]?.count || 0
+  }
+}
 
 // Fetch all categories with their place counts
 export async function getCategories () {

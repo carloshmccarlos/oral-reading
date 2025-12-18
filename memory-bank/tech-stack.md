@@ -7,7 +7,7 @@
 - **Rendering:** RSC-first, mix of static generation (SSG) and server-side rendering (SSR) where needed
 - **Styling & UI:** Tailwind CSS + shadcn/ui (Radix UI primitives)
 - **Animations:** Framer Motion for subtle page and element transitions
-- **State & URL Params:** React state + `nuqs` for URL search parameter state
+- **State & URL Params:** React state + URL search parameters
 - **Validation:** Zod for runtime schema validation (forms, URL/query params, server data)
 - **Data Layer:** PostgreSQL + Drizzle ORM (drizzle-orm + drizzle-kit)
 - **Deployment:** Vercel (app) + managed Postgres (e.g., Neon/Supabase/Railway)
@@ -21,7 +21,7 @@ This stack is optimized for: fast reading experience, clean UI, simple deploymen
 ## 2. Application Architecture
 
 - **Directory layout**
-  - `src/app` – Next.js App Router routes (`/`, `/categories`, `/places`, `/scenarios`, `/stories/[storySlug]`, `/about`)
+  - `src/app` – Next.js App Router routes (`/`, `/categories`, `/scenarios`, `/stories/[storySlug]`, `/about`)
   - `src/components` – shared UI components (cards, layout, navigation, story reader, phrase tooltip, vocab panel)
   - `src/components/_...` – feature-scoped private components when needed
   - `src/lib` – utilities (Drizzle DB client, schema, queries, feature helpers, analytics, etc.)
@@ -33,12 +33,11 @@ This stack is optimized for: fast reading experience, clean UI, simple deploymen
   - Use **static generation (SSG)** with incremental revalidation for:
     - `/` Home
     - `/categories`
-    - `/places` and `/scenarios` lists (revalidate periodically as content grows)
+    - `/scenarios` list (revalidate periodically as content grows)
     - `/stories/[storySlug]` story pages (static content is ideal for reading + SEO).
   - Use small **client components** only where necessary:
     - Interactive reading controls (font size selector, translation toggle, audio controls)
     - Hover/tap tooltips for phrases
-    - Filters that need instant response and URL sync (`nuqs`).
 
 ---
 
@@ -73,12 +72,6 @@ This stack is optimized for: fast reading experience, clean UI, simple deploymen
     - Expanding/collapsing vocabulary panels or toggles.
   - Keep animations minimal to maintain reading focus.
 
-- **nuqs (URL state)**
-  - Manage URL search parameters for:
-    - `/places?category=Home`
-    - `/scenarios?category=Home&place=Bedroom`
-    - Potential future filters (difficulty, length, tags).
-  - Ensures links are shareable and back/forward navigation behaves intuitively.
 
 ---
 
@@ -128,7 +121,6 @@ This stack is optimized for: fast reading experience, clean UI, simple deploymen
 - **Routes** (App Router):
   - `/` – Home, intro, “Start Reading”, “Browse by Category”, “Today’s Scenario”.
   - `/categories` – list of categories.
-  - `/places` – filtered list of places for a given category (using URL params and `nuqs`).
   - `/scenarios` – scenario cards filtered by category/place.
   - `/stories/[storySlug]` – main story reading page with highlights and vocabulary panel.
   - `/about` – how to use the site and explanation of learning tools.

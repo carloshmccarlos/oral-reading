@@ -1,38 +1,119 @@
-Scenario: [Insert one scenario from the JSON]
+Task:
+Write a detailed, casual, realistic daily-life article in American spoken English for English learners.
+The writing should feel like talking to a friend, a vlog narration, or inner monologue — NOT formal writing.
 
-Task: Write a detailed, casual, realistic “daily life” article in American English for English learners. Describe every small movement, action, and object in a natural, conversational style — like narrating a YouTube vlog or talking to a friend.
+Context:
+
+Scenario: ${scenario.seedText}
+
+Place: ${scenario.placeName}
+
+Category: ${scenario.categoryName}
 
 Tone & Style:
 
-Casual, friendly, American English
+Very casual, natural American English
 
-Include tiny details: posture, hand movements, facial expressions, objects, water/sound, hair, etc.
+Conversational, imperfect, human
 
-Include internal dialogue and filler words (uh, hmm, like, basically, whatever)
+Light humor, self-talk, mild frustration
 
-Include humor and lighthearted reactions
+Sounds like real speech, not a textbook
 
 Content Requirements:
 
-Micro-actions & objects: Describe realistic movements (e.g., reaching for something, opening a drawer, sipping coffee, wiping a counter).
+Micro-actions: describe tiny movements and behaviors (hands, posture, facial expressions, walking, bending, touching objects, sounds)
 
-Internal thoughts & dialogue: Show what the person is thinking or reacting to.
+Objects everywhere: everyday items (desk, bed, phone, cables, mug, drawer, chair, floor)
 
-Spoken English focus: Include phrasal verbs, idioms, and filler words Americans actually use.
+Spoken English focus: heavy use of phrasal verbs, casual idioms, filler expressions
 
-Length: 400–700 words.
+Natural flow: no teaching tone, no explanations inside the story
 
-Optional: Provide Chinese translations for key spoken phrases.
+Language Rules:
 
-Output Structure:
+Use short to medium sentences
 
-Title: [Scenario name] (Casual American English)
+Use contractions (I'm, it's, gotta, kinda)
 
-Article: [Casual, realistic narrative with detailed actions, thoughts, and dialogue]
+Avoid formal vocabulary
 
-Key Phrases & Words: [List highlighted movement verbs, objects, and idioms useful for conversation]
+Avoid perfect grammar if it sounds unnatural
+
+Length:
+
+400–700 words
+
+Formatting rules for the story body:
+
+Paragraphs separated by blank lines
+
+Key Phrases & Words rules (VERY IMPORTANT):
+
+ALL phrases MUST appear exactly in the article text
+
+Copy the phrase verbatim from the article (no rewriting)
+
+If the phrase is a verb or phrasal verb, keep the exact form used
+(e.g. “digging around”, “muttered”, “yanked it open”)
+
+Do NOT convert verbs to base form in the phrase field
+
+ONLY list words or short phrases (NO full sentences)
+
+Focus on:
+
+movement verbs
+
+phrasal verbs
+
+casual idioms
+
+object names
+
+spoken expressions
+
+Key phrase explanation rules:
+
+phrase: exact text from the article
+
+meaningEn: explain the base / normal form and meaning
 
 Example:
-Scenario: “Looking for something lost in the room”
+phrase: "digging around"
+meaningEn: "dig around — to search messily or without order"
 
-Describe checking drawers, tossing cushions, peeking under the bed, muttering, getting frustrated, finding the object, celebrating.
+meaningZh: Chinese explanation of the base meaning
+
+type: one of
+
+movement
+
+phrasal verb
+
+idiom
+
+object
+
+spoken expression
+
+Number of key phrases:
+
+Include 8–12 items
+
+Response format (STRICT):
+You MUST respond with valid JSON only (no markdown, no extra text).
+Use this exact structure:
+
+{
+"title": "A short, engaging title (casual American English)",
+"bodyMarkdown": "The full story text with paragraphs separated by blank lines.",
+"keyPhrases": [
+{
+"phrase": "",
+"meaningEn": "",
+"meaningZh": "",
+"type": ""
+}
+]
+}

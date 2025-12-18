@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 import { StoryAudioDock } from '@/components/story-audio-dock'
 import { StoryReader } from '@/components/story-reader'
 import { getScenarioBySlug, getVocabularyItemsByStoryId } from '@/lib/db/queries'
+import { siteName } from '@/lib/site'
 
 interface StoryPageProps {
   params: Promise<{
@@ -13,21 +14,38 @@ interface StoryPageProps {
   }>
 }
 
-export async function generateMetadata ({ params }: StoryPageProps) {
+export async function generateMetadata({ params }: StoryPageProps) {
   const { slug } = await params
   const scenario = await getScenarioBySlug(slug)
 
   if (!scenario) {
-    return { title: 'Story Not Found | Read Oral English' }
+    return { title: 'Story Not Found' }
   }
 
+  const description =
+    scenario.shortDescription ||
+    `A short story for oral reading practice set in ${scenario.placeName}.`
+
   return {
-    title: `${scenario.title} | Read Oral English`,
-    description: scenario.shortDescription || `Read "${scenario.title}" - a scenario set in ${scenario.placeName}`
+    title: scenario.title,
+    description,
+    alternates: { canonical: `/stories/${scenario.slug}` },
+    openGraph: {
+      type: 'article',
+      title: scenario.title,
+      description,
+      siteName,
+      url: `/stories/${scenario.slug}`
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: scenario.title,
+      description
+    }
   }
 }
 
-export default async function StoryPage ({ params }: StoryPageProps) {
+export default async function StoryPage({ params }: StoryPageProps) {
   const { slug } = await params
   const scenario = await getScenarioBySlug(slug)
 
@@ -50,15 +68,12 @@ export default async function StoryPage ({ params }: StoryPageProps) {
           >
             ← {scenario.placeName} Scenarios
           </Link>
-
-          <div className="font-serif italic">Read Oral English.</div>
-
           <div className="w-[100px]" />
         </div>
       </div>
 
       {/* Main content layout */}
-      <main className="mx-auto max-w-[1100px] px-6 pb-32 pt-12">
+      <main className="mx-auto max-w-[1100px] px-6 pb-32 pt-8">
         <div>
           <article>
             {/* Story header */}
@@ -75,15 +90,15 @@ export default async function StoryPage ({ params }: StoryPageProps) {
                 {scenario.storyTitle || scenario.title}
               </h1>
 
-              <p className="text-lg italic text-text-muted">
-                {scenario.shortDescription || 'A realistic scenario to practice everyday English.'}
-              </p>
+              {/*<p className="text-lg italic text-text-muted">*/}
+              {/*  {scenario.shortDescription || 'A realistic scenario to practice everyday English.'}*/}
+              {/*</p>*/}
             </header>
 
             <StoryReader
               body={scenario.storyBody || ''}
               vocabularyItems={vocabularyItems}
-              footer={(
+              footer={
                 <div className="mt-16 flex justify-between border-t border-border pt-8">
                   <Link
                     href={`/scenarios?category=${scenario.categorySlug}&place=${scenario.placeSlug}`}
@@ -91,11 +106,9 @@ export default async function StoryPage ({ params }: StoryPageProps) {
                   >
                     ← Back to Scenarios
                   </Link>
-                  <span className="font-semibold">
-                    More stories coming soon →
-                  </span>
+                  <span className="font-semibold">More stories coming soon →</span>
                 </div>
-              )}
+              }
             />
           </article>
         </div>
@@ -103,10 +116,7 @@ export default async function StoryPage ({ params }: StoryPageProps) {
 
       {/* Audio dock: plays the story narration from a Cloudflare R2 (public) URL. */}
       {scenario.audioUrl && (
-        <StoryAudioDock
-          src={scenario.audioUrl}
-          title={scenario.storyTitle || scenario.title}
-        />
+        <StoryAudioDock src={scenario.audioUrl} title={scenario.storyTitle || scenario.title} />
       )}
     </div>
   )

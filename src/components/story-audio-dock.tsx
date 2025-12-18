@@ -77,11 +77,11 @@ export function StoryAudioDock ({ src, title }: { src: string, title: string }) 
 
     // Keep dock state in sync with the underlying <audio> element.
     function handleLoadedMetadata () {
-      setDuration(audio.duration || 0)
+      setDuration(audioRef.current?.duration || 0)
     }
 
     function handleTimeUpdate () {
-      setCurrentTime(audio.currentTime || 0)
+      setCurrentTime(audioRef.current?.currentTime || 0)
     }
 
     function handlePlay () {

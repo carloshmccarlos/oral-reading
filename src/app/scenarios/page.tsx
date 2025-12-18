@@ -10,7 +10,9 @@ import {
 } from '@/lib/db/queries'
 
 export const metadata = {
-  title: 'Scenarios | Read Oral English',
+  title: 'Scenarios',
+  description: 'Pick a place and start reading: short, realistic scenarios designed for oral reading and shadowing practice.',
+  alternates: { canonical: '/scenarios' }
 }
 
 interface ScenariosPageProps {

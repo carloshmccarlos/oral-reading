@@ -6,7 +6,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-black/5 bg-bg/90 backdrop-blur-md">
       <div className="mx-auto flex h-(--nav-height) max-w-container items-center justify-between px-8">
         <Link href="/" className="font-serif text-2xl font-semibold italic">
-          Read Oral English
+          OR
         </Link>
 
         <div className="flex items-center gap-6">

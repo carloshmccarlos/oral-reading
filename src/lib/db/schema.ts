@@ -3,6 +3,7 @@
 import { relations } from 'drizzle-orm'
 import {
   index,
+  integer,
   pgTable,
   text,
   timestamp,
@@ -142,5 +143,34 @@ export const vocabularyItemsRelations = relations(vocabularyItems, ({ one }) => 
   story: one(stories, {
     fields: [vocabularyItems.storyId],
     references: [stories.id]
+  })
+}))
+
+// Story generation job tracking table for cron pipeline
+export const storyGenerationJobs = pgTable(
+  'story_generation_jobs',
+  {
+    id: text('id')
+      .primaryKey()
+      .$defaultFn(() => crypto.randomUUID()),
+    scenarioId: text('scenario_id').notNull().unique(),
+    status: text('status').notNull().default('queued'), // queued | running | succeeded | failed
+    attemptCount: integer('attempt_count').notNull().default(0),
+    lockedAt: timestamp('locked_at', { withTimezone: true }),
+    lockedBy: text('locked_by'),
+    lastError: text('last_error'),
+    lastAttemptAt: timestamp('last_attempt_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow()
+  },
+  (table) => [
+    index('story_generation_jobs_status_idx').on(table.status)
+  ]
+)
+
+export const storyGenerationJobsRelations = relations(storyGenerationJobs, ({ one }) => ({
+  scenario: one(scenarios, {
+    fields: [storyGenerationJobs.scenarioId],
+    references: [scenarios.id]
   })
 }))
