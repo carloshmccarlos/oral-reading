@@ -43,7 +43,8 @@ export function ManualGenerationPanel () {
         const response = await fetch('/api/admin/generate', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
-          body: JSON.stringify({ limit: resolvedLimit })
+          body: JSON.stringify({ limit: resolvedLimit }),
+          credentials: 'include'
         })
 
         if (!response.ok) {
