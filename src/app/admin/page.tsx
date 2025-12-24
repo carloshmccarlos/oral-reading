@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { ManualGenerationPanel } from '@/components/admin/manual-generation-panel'
+import { PaginationControls } from '@/components/admin/pagination-controls'
 import { adminSessionCookieName, isAdminSessionValid } from '@/lib/admin-auth'
 import { getJobsPage, getJobsTotalCount, getJobStatusCounts } from '@/lib/db/jobs'
 import { getDataSummary } from '@/lib/db/queries'
@@ -49,7 +50,7 @@ export default async function AdminPage (props: {
   const rawPage = searchParams?.page
   const pageString = Array.isArray(rawPage) ? rawPage[0] : rawPage
   const page = Math.max(1, Number(pageString || '1') || 1)
-  const pageSize = 50
+  const pageSize = 10
 
   const [jobsTotal, jobCounts, dataSummary] = await Promise.all([
     getJobsTotalCount(),
@@ -66,8 +67,6 @@ export default async function AdminPage (props: {
   const offset = (safePage - 1) * pageSize
   const jobs = await getJobsPage({ limit: pageSize, offset })
 
-  const hasPrevious = safePage > 1
-  const hasNext = safePage < totalPages
   const startIndex = jobsTotal === 0 ? 0 : offset + 1
   const endIndex = Math.min(offset + jobs.length, jobsTotal)
 
@@ -187,36 +186,14 @@ export default async function AdminPage (props: {
             <div className="px-4 py-3 border-b border-border">
               <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <h2 className="font-semibold text-text-main">Generation Jobs</h2>
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
-                  <div className="text-xs text-text-muted">
-                    {jobsTotal === 0 ? '0 jobs' : `${startIndex}-${endIndex} of ${jobsTotal}`}
-                  </div>
-                  <div className="flex items-center gap-3">
-                    {hasPrevious ? (
-                      <Link
-                        href={`/admin?page=${safePage - 1}`}
-                        className="text-xs text-text-muted underline"
-                      >
-                        Prev
-                      </Link>
-                    ) : (
-                      <span className="text-xs text-text-muted">Prev</span>
-                    )}
-
-                    <span className="text-xs text-text-muted">Page {safePage} / {totalPages}</span>
-
-                    {hasNext ? (
-                      <Link
-                        href={`/admin?page=${safePage + 1}`}
-                        className="text-xs text-text-muted underline"
-                      >
-                        Next
-                      </Link>
-                    ) : (
-                      <span className="text-xs text-text-muted">Next</span>
-                    )}
-                  </div>
-                </div>
+                <PaginationControls
+                  page={safePage}
+                  totalPages={totalPages}
+                  totalItems={jobsTotal}
+                  startIndex={startIndex}
+                  endIndex={endIndex}
+                  basePath="/admin"
+                />
               </div>
             </div>
             <div className="overflow-x-auto">

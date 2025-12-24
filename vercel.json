@@ -1,8 +1,2 @@
 {
-  "crons": [
-    {
-      "path": "/api/cron/generate-stories",
-      "schedule": "*/10 * * * *"
-    }
-  ]
 }

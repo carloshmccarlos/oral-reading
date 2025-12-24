@@ -46,7 +46,7 @@ export function ManualGenerationPanel () {
     setResult(null)
 
     try {
-      const response = await fetch('/api/cron/generate-stories', {
+      const response = await fetch('/api/cron', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ limit: resolvedLimit })
