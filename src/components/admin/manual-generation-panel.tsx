@@ -4,8 +4,6 @@ import { useCallback, useMemo, useState, useTransition } from 'react'
 import { triggerManualGeneration } from '@/app/admin/actions'
 import { Button } from '@/components/ui/button'
 
-const MAX_LIMIT = 5
-
 interface ApiResult {
   success: boolean
   processed: number
@@ -21,10 +19,6 @@ interface ApiResult {
 function clampLimit (value: number) {
   if (!Number.isFinite(value) || value < 1) {
     return 1
-  }
-
-  if (value > MAX_LIMIT) {
-    return MAX_LIMIT
   }
 
   return Math.floor(value)
@@ -65,20 +59,19 @@ export function ManualGenerationPanel () {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div className="flex-1">
           <label htmlFor="generation-limit" className="text-sm font-medium text-text-main">
-            Stories to generate (1-{MAX_LIMIT})
+            Stories to generate
           </label>
           <input
             id="generation-limit"
             type="number"
             min={1}
-            max={MAX_LIMIT}
             value={limitInput}
             onChange={(event) => setLimitInput(event.target.value)}
             className="mt-1 w-full rounded-md border border-border bg-bg px-3 py-2 text-text-main outline-none focus:ring-2 focus:ring-primary"
             disabled={isPending}
           />
           <p className="mt-1 text-xs text-text-muted">
-            Values outside the allowed range will be clamped automatically.
+            Values below 1 will be clamped up automatically.
           </p>
         </div>
         <Button onClick={onSubmit} disabled={isPending} className="h-11 w-full sm:w-auto">

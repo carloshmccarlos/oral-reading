@@ -4,15 +4,9 @@ import { cookies } from 'next/headers'
 import { adminSessionCookieName, isAdminSessionValid } from '@/lib/admin-auth'
 import { runGenerationBatch } from '@/lib/generation-runner'
 
-const MAX_LIMIT = 5
-
-function clampLimit (value?: number) {
+function normalizeLimit (value?: number) {
   if (!value || Number.isNaN(value) || value < 1) {
     return 1
-  }
-
-  if (value > MAX_LIMIT) {
-    return MAX_LIMIT
   }
 
   return Math.floor(value)
@@ -25,7 +19,7 @@ export async function triggerManualGeneration (input: { limit?: number }) {
     throw new Error('Unauthorized request')
   }
 
-  const limit = clampLimit(input.limit)
+  const limit = normalizeLimit(input.limit)
 
   const runResult = await runGenerationBatch({
     limit,
