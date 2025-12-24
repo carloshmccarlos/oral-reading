@@ -1,6 +1,7 @@
 'use client'
 
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useTransition } from 'react'
+import { triggerManualGeneration } from '@/app/admin/actions'
 import { Button } from '@/components/ui/button'
 
 const MAX_LIMIT = 5
@@ -31,41 +32,32 @@ function clampLimit (value: number) {
 
 export function ManualGenerationPanel () {
   const [limitInput, setLimitInput] = useState('1')
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [result, setResult] = useState<ApiResult | null>(null)
+  const [isPending, startTransition] = useTransition()
 
   const resolvedLimit = useMemo(() => {
     const parsed = Number(limitInput)
     return clampLimit(parsed)
   }, [limitInput])
 
-  const onSubmit = useCallback(async () => {
-    setIsSubmitting(true)
+  const onSubmit = useCallback(() => {
     setErrorMessage(null)
     setResult(null)
 
-    try {
-      const response = await fetch('/api/cron', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ limit: resolvedLimit })
-      })
-
-      if (!response.ok) {
-        const payload = await response.json().catch(() => ({}))
-        setErrorMessage(payload.error || 'Generation failed. Check logs for details.')
-        return
+    startTransition(async () => {
+      try {
+        const payload = await triggerManualGeneration({ limit: resolvedLimit })
+        setResult(payload)
+      } catch (error) {
+        console.error('[ManualGenerationPanel] Server generation failed', error)
+        if (error instanceof Error) {
+          setErrorMessage(error.message)
+        } else {
+          setErrorMessage('Unexpected error while triggering generation.')
+        }
       }
-
-      const payload = await response.json() as ApiResult
-      setResult(payload)
-    } catch (error) {
-      console.error('[ManualGenerationPanel] Failed to trigger cron', error)
-      setErrorMessage('Unexpected error while calling the API.')
-    } finally {
-      setIsSubmitting(false)
-    }
+    })
   }, [resolvedLimit])
 
   return (
@@ -83,14 +75,14 @@ export function ManualGenerationPanel () {
             value={limitInput}
             onChange={(event) => setLimitInput(event.target.value)}
             className="mt-1 w-full rounded-md border border-border bg-bg px-3 py-2 text-text-main outline-none focus:ring-2 focus:ring-primary"
-            disabled={isSubmitting}
+            disabled={isPending}
           />
           <p className="mt-1 text-xs text-text-muted">
             Values outside the allowed range will be clamped automatically.
           </p>
         </div>
-        <Button onClick={onSubmit} disabled={isSubmitting} className="h-11 w-full sm:w-auto">
-          {isSubmitting ? 'Generating…' : `Generate ${resolvedLimit}`}
+        <Button onClick={onSubmit} disabled={isPending} className="h-11 w-full sm:w-auto">
+          {isPending ? 'Generating…' : `Generate ${resolvedLimit}`}
         </Button>
       </div>
 
