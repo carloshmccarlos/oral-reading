@@ -1,7 +1,6 @@
 'use client'
 
 import { useCallback, useMemo, useState, useTransition } from 'react'
-import { triggerManualGeneration } from '@/app/admin/actions'
 import { Button } from '@/components/ui/button'
 
 interface ApiResult {
@@ -41,15 +40,23 @@ export function ManualGenerationPanel () {
 
     startTransition(async () => {
       try {
-        const payload = await triggerManualGeneration({ limit: resolvedLimit })
+        const response = await fetch('/api/admin/generate', {
+          method: 'POST',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ limit: resolvedLimit })
+        })
+
+        if (!response.ok) {
+          const payload = await response.json().catch(() => ({}))
+          setErrorMessage(payload.error || 'Generation failed. Check logs for details.')
+          return
+        }
+
+        const payload = await response.json() as ApiResult
         setResult(payload)
       } catch (error) {
         console.error('[ManualGenerationPanel] Server generation failed', error)
-        if (error instanceof Error) {
-          setErrorMessage(error.message)
-        } else {
-          setErrorMessage('Unexpected error while triggering generation.')
-        }
+        setErrorMessage('Unexpected error while triggering generation.')
       }
     })
   }, [resolvedLimit])
