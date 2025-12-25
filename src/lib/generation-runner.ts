@@ -2,7 +2,6 @@ import { claimNextJob, createMissingJobs } from '@/lib/db/jobs'
 import { generateStoryAndAudioForScenario } from '@/lib/generation-pipeline'
 
 const DEFAULT_LIMIT = 1
-const MAX_LIMIT = 5
 const INTER_JOB_DELAY_MS = 1000
 
 export interface GenerationRunOptions {
@@ -33,10 +32,6 @@ function clampLimit (limit?: number) {
   const normalized = Math.floor(limit)
   if (normalized < 1) {
     return 1
-  }
-
-  if (normalized > MAX_LIMIT) {
-    return MAX_LIMIT
   }
 
   return normalized
